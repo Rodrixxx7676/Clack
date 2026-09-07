@@ -1,0 +1,35 @@
+# ---------------------------------------------------------------------
+# Configuración de Caddy para Clack
+# ---------------------------------------------------------------------
+# Este bloque se agrega al Caddyfile del servidor (normalmente en
+# /etc/caddy/Caddyfile), SIN borrar lo que ya está: n8n sigue igual.
+#
+# Qué hace:
+#   · Atiende https://clack.kursperu.duckdns.org
+#   · Pide y renueva el certificado HTTPS solo (Let's Encrypt)
+#   · Le pasa todo al servidor de Clack, que escucha en el puerto 3001
+# ---------------------------------------------------------------------
+
+clack.kursperu.duckdns.org {
+	# Comprime las respuestas: la web carga más rápido.
+	encode zstd gzip
+
+	# El proxy inverso: de internet hacia el puerto 3001 de esta máquina.
+	reverse_proxy 127.0.0.1:3001
+
+	# Cabeceras de seguridad básicas.
+	header {
+		# El navegador recuerda que este sitio es solo HTTPS.
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		# Evita que otras webs metan Clack dentro de un marco.
+		X-Frame-Options "SAMEORIGIN"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	log {
+		output file /var/log/caddy/clack.log
+		format console
+	}
+}

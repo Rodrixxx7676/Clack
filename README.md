@@ -34,6 +34,7 @@ Abre la dirección que aparece en la terminal (normalmente <http://localhost:517
 También puedes pulsar el botón **“Cuenta demo”** y se rellena sola.
 
 Para generar la versión final (la que se sube a internet): `npm run build`.
+Para publicarla en el servidor, mira **[DESPLIEGUE.md](DESPLIEGUE.md)**.
 
 ---
 
@@ -47,6 +48,12 @@ Clack/
 ├── index.html                  ← El cascarón donde React dibuja todo
 ├── package.json                ← Lista de herramientas que usa el proyecto
 ├── vite.config.js              ← Configuración del servidor de desarrollo
+├── DESPLIEGUE.md               ← Cómo poner Clack en internet
+├── servidor/
+│   └── servidor.js             ← Entrega la web en el puerto 3001
+├── despliegue/
+│   ├── Caddyfile.clack         ← Config del proxy inverso (HTTPS)
+│   └── clack.service           ← Para que arranque solo al encender
 └── src/
     ├── main.jsx                ← Enciende React y carga los estilos
     ├── App.jsx                 ← La raíz: sin sesión muestra el Login,

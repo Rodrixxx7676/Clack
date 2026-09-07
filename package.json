@@ -7,9 +7,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "servidor": "node servidor/servidor.js",
+    "publicar": "npm run build && npm run servidor"
   },
   "dependencies": {
+    "express": "^4.22.2",
     "gsap": "^3.15.0",
     "ogl": "^1.0.11",
     "react": "^18.3.1",
