@@ -1,25 +1,26 @@
 # 🕒 Clack
 
 Una página web para ver **la hora y la temperatura de las ciudades del mundo**,
-con un diseño *Liquid Glass* (vidrio líquido).
+hecha en **React**, con diseño *Liquid Glass* en **blanco y turquesa**.
 
 > **Estado actual: Paso 1 — Pantalla de inicio de sesión (Login).**
 > Las pantallas del reloj mundial y del clima llegan en los siguientes pasos.
 
 ---
 
-## ▶️ Cómo ver la página
+## ▶️ Cómo verla en tu computador
 
-La app no necesita instalar nada: es HTML, CSS y JavaScript puro.
+Necesitas [Node.js](https://nodejs.org) instalado. Luego, dentro de la carpeta `Clack`:
 
-1. Abre una terminal dentro de la carpeta `Clack`.
-2. Levanta un servidor local (hace falta porque usamos módulos de JavaScript):
+```bash
+npm install
+```
 
-   ```bash
-   python3 -m http.server 8000
-   ```
+```bash
+npm run dev
+```
 
-3. Entra a <http://localhost:8000> en tu navegador.
+Abre la dirección que aparece en la terminal (normalmente <http://localhost:5173>).
 
 **Cuenta de prueba:**
 
@@ -28,6 +29,8 @@ La app no necesita instalar nada: es HTML, CSS y JavaScript puro.
 | `demo@clack.app`  | `clack1234` |
 
 También puedes pulsar el botón **“Cuenta demo”** y se rellena sola.
+
+Para generar la versión final (la que se sube a internet): `npm run build`.
 
 ---
 
@@ -38,10 +41,12 @@ Google. La idea es simple: **cada carpeta tiene un solo trabajo.**
 
 ```
 Clack/
-├── index.html                  ← La página que abre el navegador
-├── README.md                   ← Este archivo
+├── index.html                  ← El cascarón donde React dibuja todo
+├── package.json                ← Lista de herramientas que usa el proyecto
+├── vite.config.js              ← Configuración del servidor de desarrollo
 └── src/
-    ├── inicio.js               ← Enciende la app y une las tres capas
+    ├── main.jsx                ← Enciende React y carga los estilos
+    ├── App.jsx                 ← La raíz: decide qué pantalla se ve
     │
     ├── modelo/                 ← 1. MODELO: los datos y las reglas
     │   ├── Usuario.js               Quién es la persona que entra
@@ -50,20 +55,27 @@ Clack/
     │   └── Reloj.js                 Dar la hora con formato bonito
     │
     ├── vista-modelo/           ← 2. VIEWMODEL: el cerebro de cada pantalla
-    │   ├── LoginViewModel.js        Estado del formulario de login
-    │   └── RelojLocalViewModel.js   La hora local, siempre al día
+    │   ├── useLoginViewModel.js     Estado del formulario de login
+    │   └── useRelojLocal.js         La hora local, siempre al día
     │
     ├── vista/                  ← 3. VISTA: lo que se ve y se toca
-    │   ├── VistaLogin.js            Conecta el HTML con el LoginViewModel
+    │   ├── PantallaLogin.jsx        Arma la pantalla completa
+    │   ├── componentes/             Piezas sueltas y reutilizables
+    │   │   ├── MarcaClack.jsx           Logo y nombre
+    │   │   ├── RelojLocal.jsx           Hora, fecha y zona horaria
+    │   │   ├── CampoTexto.jsx           Un campo del formulario
+    │   │   ├── CampoContrasena.jsx      Campo con el ojo de "mostrar"
+    │   │   ├── InterruptorRecordarme.jsx
+    │   │   └── PanelBienvenida.jsx      Lo que se ve al entrar
+    │   ├── fondos/
+    │   │   ├── FondoWebThreads.jsx      Configura el fondo (colores, forma)
+    │   │   ├── WebThreads.jsx           Motor gráfico de React Bits ⚠️ no tocar
+    │   │   └── WebThreads.css
     │   └── efectos/
-    │       └── EfectoVidrio.js      El brillo que sigue al cursor
-    │
-    ├── nucleo/                 ← Piezas compartidas por toda la app
-    │   ├── Observable.js            Avisa cuando un dato cambia
-    │   └── EnlaceDatos.js           Amarra los datos con el HTML
+    │       └── useBrilloCursor.js       El brillo que sigue al cursor
     │
     └── estilos/                ← El aspecto visual
-        ├── base.css                 Colores, tipografía y fondo animado
+        ├── base.css                 Colores de la marca y tipografía
         ├── liquid-glass.css         Las piezas de vidrio reutilizables
         └── login.css                Solo la pantalla de login
 ```
@@ -77,31 +89,41 @@ Usuario ───────────────▶ VISTA ◀────�
                           └──── avisa que algo cambió ◀──────┘
 ```
 
-* La **Vista** nunca decide nada: solo muestra y avisa.
-* El **ViewModel** decide, pero no sabe que existe el HTML.
+* La **Vista** (`.jsx`) nunca decide nada: solo muestra y avisa.
+* El **ViewModel** (los hooks `use...`) decide, pero no sabe que existe el HTML.
 * El **Modelo** solo se preocupa de los datos y las reglas.
 
-Gracias a eso, cuando conectemos un servidor real de verdad solo cambia
+Gracias a eso, cuando conectemos un servidor real solo cambia
 `ServicioAutenticacion.js`: ni la Vista ni el ViewModel se tocan.
+
+> 💡 En React, el ViewModel de MVVM se escribe como un **hook**
+> (una función que empieza con `use`). Por eso los archivos se llaman
+> `useLoginViewModel.js` y `useRelojLocal.js`.
 
 ---
 
-## 🧊 Sobre el diseño Liquid Glass
+## 🎨 Sobre el diseño
 
-* Superficies translúcidas con desenfoque (`backdrop-filter`) y saturación.
-* Bordes finos y luces internas que imitan el canto del vidrio.
-* Un brillo especular que **sigue al cursor** sobre la tarjeta.
-* Burbujas de color que flotan detrás del vidrio.
-* Respeta `prefers-reduced-motion` para quien prefiere menos movimiento.
-
+**Paleta:** blanco de fondo, turquesa para todo lo importante.
 Todos los colores viven en variables CSS dentro de `src/estilos/base.css`:
 cambiando ahí, cambia toda la app.
+
+**Fondo animado:** el componente [`WebThreads`](https://reactbits.dev/backgrounds/web-threads)
+de React Bits, en su modo claro (`lightMode`), pintando hilos turquesa sobre
+blanco con WebGL. Los hilos reaccionan al movimiento del mouse.
+La configuración (colores, velocidad, grosor) está en `FondoWebThreads.jsx`;
+el motor `WebThreads.jsx` se deja tal cual para poder actualizarlo cuando
+salga una versión nueva.
+
+**Liquid Glass:** superficies translúcidas con desenfoque (`backdrop-filter`),
+bordes finos con luz interior, un brillo especular que sigue al cursor y
+sombras suaves en turquesa. Respeta `prefers-reduced-motion`.
 
 ---
 
 ## 🛣️ Próximos pasos
 
-- [x] **Paso 1 —** Pantalla de Login con estilo Liquid Glass.
+- [x] **Paso 1 —** Login en React, Liquid Glass blanco + turquesa, fondo WebThreads.
 - [ ] **Paso 2 —** Panel principal con el reloj de varias ciudades.
 - [ ] **Paso 3 —** Temperatura actual de cada ciudad.
 - [ ] **Paso 4 —** Buscar y guardar ciudades favoritas.
@@ -113,3 +135,11 @@ cambiando ahí, cambia toda la app.
 La autenticación de este paso es **de demostración**: la cuenta está escrita
 dentro de `ServicioAutenticacion.js` y la sesión se guarda en el navegador.
 No sirve para proteger información real todavía.
+
+---
+
+## 🙏 Créditos
+
+Fondo animado: [WebThreads](https://reactbits.dev/backgrounds/web-threads) de
+[React Bits](https://reactbits.dev), que usa la librería
+[`ogl`](https://github.com/oframe/ogl) para dibujar con WebGL.

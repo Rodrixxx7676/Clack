@@ -8,20 +8,23 @@
 .vidrio {
   position: relative;
   isolation: isolate;
-  background:
-    linear-gradient(155deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04));
-  backdrop-filter: blur(var(--vidrio-desenfoque)) saturate(190%);
-  -webkit-backdrop-filter: blur(var(--vidrio-desenfoque)) saturate(190%);
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.68),
+    rgba(255, 255, 255, 0.44)
+  );
+  backdrop-filter: blur(var(--vidrio-desenfoque)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--vidrio-desenfoque)) saturate(160%);
   border: 1px solid var(--vidrio-borde);
   border-radius: var(--radio-grande);
   box-shadow:
     var(--sombra-flotante),
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.10);
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(20, 184, 166, 0.08);
   overflow: hidden;
 }
 
-/* Brillo que sigue al cursor (lo mueve EfectoVidrio.js). */
+/* Brillo que sigue al cursor (lo mueve el hook useBrilloCursor). */
 .vidrio::before {
   content: "";
   position: absolute;
@@ -32,13 +35,13 @@
     var(--vidrio-brillo),
     transparent 70%
   );
-  opacity: 0.28;
+  opacity: 0.5;
   transition: opacity var(--transicion);
   pointer-events: none;
 }
 
 .vidrio:hover::before {
-  opacity: 0.42;
+  opacity: 0.75;
 }
 
 /* --- Campos de texto ---------------------------------------------------- */
@@ -68,11 +71,11 @@
   font-family: inherit;
   color: var(--texto-principal);
   background: var(--vidrio-fondo-suave);
-  border: 1px solid rgba(255, 255, 255, 0.20);
+  border: 1px solid rgba(15, 118, 110, 0.22);
   border-radius: var(--radio-medio);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
   transition: border-color var(--transicion), background var(--transicion),
     box-shadow var(--transicion);
 }
@@ -82,23 +85,23 @@
 }
 
 .campo__entrada:hover {
-  background: var(--vidrio-fondo);
+  background: rgba(255, 255, 255, 0.66);
 }
 
 .campo__entrada:focus {
   outline: none;
-  border-color: rgba(90, 200, 250, 0.75);
-  background: rgba(255, 255, 255, 0.14);
+  border-color: var(--turquesa);
+  background: rgba(255, 255, 255, 0.85);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    0 0 0 4px rgba(90, 200, 250, 0.18);
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 0 0 4px rgba(20, 184, 166, 0.20);
 }
 
 .campo__entrada--con-error {
-  border-color: rgba(255, 138, 128, 0.85);
+  border-color: rgba(179, 38, 30, 0.55);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 0 0 4px rgba(255, 69, 58, 0.16);
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 0 0 4px rgba(179, 38, 30, 0.12);
 }
 
 .campo__entrada--con-boton {
@@ -128,8 +131,8 @@
 }
 
 .campo__boton:hover {
-  background: rgba(255, 255, 255, 0.14);
-  color: var(--texto-principal);
+  background: rgba(20, 184, 166, 0.14);
+  color: var(--turquesa-medio);
 }
 
 /* --- Botón principal ---------------------------------------------------- */
@@ -140,14 +143,14 @@
   font-size: 16px;
   font-weight: 650;
   font-family: inherit;
-  color: #04121f;
-  background: linear-gradient(135deg, var(--acento) 0%, var(--acento-fuerte) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--turquesa-medio) 0%, var(--turquesa-oscuro) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: var(--radio-medio);
   cursor: pointer;
   box-shadow:
-    0 14px 30px rgba(10, 132, 255, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    0 14px 30px rgba(15, 118, 110, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
   transition: transform var(--transicion), box-shadow var(--transicion),
     filter var(--transicion);
 }
@@ -155,8 +158,8 @@
 .boton-principal:hover:not([disabled]) {
   transform: translateY(-2px);
   box-shadow:
-    0 20px 38px rgba(10, 132, 255, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    0 20px 38px rgba(15, 118, 110, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 
 .boton-principal:active:not([disabled]) {
@@ -165,7 +168,7 @@
 
 .boton-principal[disabled] {
   cursor: progress;
-  filter: saturate(0.7) brightness(0.9);
+  filter: saturate(0.75) brightness(1.05);
 }
 
 .boton-principal--cargando::after {
@@ -176,8 +179,8 @@
   width: 16px;
   height: 16px;
   margin-top: -8px;
-  border: 2px solid rgba(4, 18, 31, 0.25);
-  border-top-color: #04121f;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
   border-radius: 50%;
   animation: girar 700ms linear infinite;
 }
@@ -194,18 +197,21 @@
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
-  color: var(--texto-principal);
+  color: var(--turquesa-medio);
   background: var(--vidrio-fondo);
-  border: 1px solid var(--vidrio-borde);
+  border: 1px solid rgba(15, 118, 110, 0.28);
   border-radius: var(--radio-medio);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   cursor: pointer;
-  transition: background var(--transicion), transform var(--transicion);
+  white-space: nowrap;
+  transition: background var(--transicion), transform var(--transicion),
+    border-color var(--transicion);
 }
 
 .boton-vidrio:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--turquesa);
   transform: translateY(-1px);
 }
 
@@ -214,7 +220,8 @@
   padding: 0;
   font-size: 13px;
   font-family: inherit;
-  color: var(--acento);
+  font-weight: 600;
+  color: var(--turquesa-medio);
   background: none;
   border: 0;
   cursor: pointer;
@@ -245,8 +252,8 @@
   position: relative;
   width: 42px;
   height: 24px;
-  background: var(--vidrio-fondo-suave);
-  border: 1px solid var(--vidrio-borde);
+  background: rgba(15, 118, 110, 0.18);
+  border: 1px solid rgba(15, 118, 110, 0.22);
   border-radius: 999px;
   transition: background var(--transicion);
 }
@@ -260,12 +267,13 @@
   height: 18px;
   background: #fff;
   border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 2px 6px rgba(7, 63, 60, 0.28);
   transition: transform var(--transicion);
 }
 
 .interruptor input:checked + .interruptor__marca {
-  background: linear-gradient(135deg, var(--acento), var(--acento-fuerte));
+  background: linear-gradient(135deg, var(--turquesa) 0%, var(--turquesa-medio) 100%);
+  border-color: transparent;
 }
 
 .interruptor input:checked + .interruptor__marca::after {
@@ -273,7 +281,7 @@
 }
 
 .interruptor input:focus-visible + .interruptor__marca {
-  outline: 2px solid var(--acento);
+  outline: 2px solid var(--acento-fuerte);
   outline-offset: 3px;
 }
 
@@ -283,9 +291,9 @@
   padding: 12px 16px;
   font-size: 14px;
   color: var(--texto-error);
-  background: rgba(255, 69, 58, 0.20);
-  border: 1px solid rgba(255, 138, 128, 0.45);
+  background: rgba(179, 38, 30, 0.09);
+  border: 1px solid rgba(179, 38, 30, 0.28);
   border-radius: var(--radio-medio);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }

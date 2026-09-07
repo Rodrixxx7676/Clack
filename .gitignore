@@ -16,3 +16,7 @@ dist/
 
 # Configuración local del editor
 .claude/
+
+# Dependencias instaladas por npm
+node_modules/
+dist/

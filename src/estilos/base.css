@@ -1,35 +1,41 @@
 /* =====================================================================
-   base.css — Los cimientos: colores, tipografía y el fondo animado.
+   base.css — Los cimientos: colores, tipografía y reglas generales.
    Cambiando las variables de :root cambia el aspecto de toda la app.
+   Paleta de Clack: BLANCO + TURQUESA.
    ===================================================================== */
 
 :root {
-  /* Colores de marca */
-  --acento: #5ac8fa;
-  --acento-fuerte: #0a84ff;
-  --acento-calido: #ff9f0a;
+  /* Turquesa de la marca (de más claro a más oscuro) */
+  --turquesa-brillo: #5eead4;
+  --turquesa-claro: #22d3ee;
+  --turquesa: #14b8a6;
+  --turquesa-medio: #0f766e;
+  --turquesa-oscuro: #0d5e57;
 
-  /* Texto */
-  --texto-principal: rgba(255, 255, 255, 0.96);
-  --texto-suave: rgba(235, 245, 255, 0.66);
-  --texto-tenue: rgba(235, 245, 255, 0.42);
-  --texto-error: #ffd2cb;
+  --acento: var(--turquesa);
+  --acento-fuerte: var(--turquesa-medio);
 
-  /* Vidrio líquido */
-  --vidrio-fondo: rgba(255, 255, 255, 0.10);
-  --vidrio-fondo-suave: rgba(255, 255, 255, 0.06);
-  --vidrio-borde: rgba(255, 255, 255, 0.28);
-  --vidrio-brillo: rgba(255, 255, 255, 0.55);
-  --vidrio-desenfoque: 30px;
+  /* Texto (verde azulado muy oscuro: combina con el turquesa) */
+  --texto-principal: #072b2a;
+  --texto-suave: #3f6b68;
+  --texto-tenue: #7ba3a0;
+  --texto-error: #9f1d16;
+
+  /* Vidrio líquido sobre fondo claro */
+  --vidrio-fondo: rgba(255, 255, 255, 0.62);
+  --vidrio-fondo-suave: rgba(255, 255, 255, 0.48);
+  --vidrio-borde: rgba(255, 255, 255, 0.85);
+  --vidrio-brillo: rgba(255, 255, 255, 0.95);
+  --vidrio-desenfoque: 26px;
 
   /* Formas y profundidad */
   --radio-grande: 32px;
   --radio-medio: 20px;
   --radio-pequeno: 14px;
-  --sombra-flotante: 0 30px 70px rgba(2, 6, 23, 0.55);
+  --sombra-flotante: 0 28px 70px rgba(7, 63, 60, 0.16);
   --transicion: 260ms cubic-bezier(0.22, 1, 0.36, 1);
 
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * {
@@ -41,86 +47,19 @@
 }
 
 html,
-body {
+body,
+#raiz {
   height: 100%;
 }
 
 body {
   margin: 0;
   min-height: 100dvh;
-  display: grid;
-  /* "safe center" centra el contenido, pero si no cabe lo alinea arriba
-     en vez de recortarlo. */
-  place-items: safe center;
-  padding: 24px;
   font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI",
     "Inter", system-ui, sans-serif;
   color: var(--texto-principal);
-  background-color: #060b1a;
-  background-image:
-    radial-gradient(120% 90% at 15% 0%, #1b3a8f 0%, transparent 55%),
-    radial-gradient(90% 80% at 85% 10%, #6d2fa8 0%, transparent 60%),
-    radial-gradient(120% 100% at 50% 110%, #0b7a8c 0%, transparent 65%);
-  background-attachment: fixed;
-  overflow-x: hidden;
-  overflow-y: auto;
+  background-color: #ffffff;
   -webkit-font-smoothing: antialiased;
-}
-
-/* --- Burbujas de color que flotan detrás del vidrio --------------------- */
-.fondo-liquido {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.fondo-liquido__burbuja {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(70px);
-  opacity: 0.55;
-  animation: flotar 22s ease-in-out infinite;
-}
-
-.fondo-liquido__burbuja--uno {
-  width: 46vmax;
-  height: 46vmax;
-  top: -14vmax;
-  left: -10vmax;
-  background: radial-gradient(circle, #4aa8ff, transparent 70%);
-}
-
-.fondo-liquido__burbuja--dos {
-  width: 38vmax;
-  height: 38vmax;
-  right: -12vmax;
-  top: 8vmax;
-  background: radial-gradient(circle, #c86dff, transparent 70%);
-  animation-delay: -7s;
-}
-
-.fondo-liquido__burbuja--tres {
-  width: 42vmax;
-  height: 42vmax;
-  bottom: -16vmax;
-  left: 25vmax;
-  background: radial-gradient(circle, #23d3c0, transparent 70%);
-  animation-delay: -14s;
-}
-
-@keyframes flotar {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  33% {
-    transform: translate3d(4vmax, 5vmax, 0) scale(1.08);
-  }
-  66% {
-    transform: translate3d(-5vmax, 3vmax, 0) scale(0.94);
-  }
 }
 
 /* Respeta a quien prefiere menos movimiento en pantalla. */
@@ -135,6 +74,6 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--acento);
+  outline: 2px solid var(--acento-fuerte);
   outline-offset: 3px;
 }

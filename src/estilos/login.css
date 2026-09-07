@@ -1,9 +1,44 @@
 /* =====================================================================
    login.css — Solo la pantalla de inicio de sesión.
-   Usa las piezas de liquid-glass.css y las ordena en la tarjeta.
+   Usa las piezas de liquid-glass.css y las ordena sobre el fondo animado.
    ===================================================================== */
 
+/* --- La pantalla completa ---------------------------------------------- */
 .pantalla-login {
+  position: relative;
+  min-height: 100dvh;
+  display: grid;
+  /* "safe center" centra el contenido, pero si no cabe lo alinea arriba
+     en vez de recortarlo. */
+  place-items: safe center;
+  padding: 24px;
+  overflow: hidden;
+}
+
+/* El fondo de hilos de luz (WebThreads) ocupa toda la pantalla, detrás. */
+.fondo-login {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Un velo blanco suave para que el texto siempre se lea bien. */
+.fondo-login::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    60% 55% at 50% 50%,
+    rgba(255, 255, 255, 0.72) 0%,
+    rgba(255, 255, 255, 0.28) 55%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.pantalla-login__contenido {
+  position: relative;
+  z-index: 1;
   width: min(430px, 100%);
   display: grid;
   animation: aparecer 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -16,6 +51,7 @@
   }
 }
 
+/* --- Tarjeta ------------------------------------------------------------ */
 .tarjeta {
   padding: 32px;
   display: flex;
@@ -26,13 +62,6 @@
 
 .tarjeta--ocupada {
   pointer-events: none;
-}
-
-.tarjeta--fuera {
-  opacity: 0;
-  transform: translateY(-14px) scale(0.97);
-  position: absolute;
-  visibility: hidden;
 }
 
 /* --- Encabezado: marca + reloj local ----------------------------------- */
@@ -55,7 +84,7 @@
 .marca__icono {
   width: 34px;
   height: 34px;
-  color: var(--acento);
+  color: var(--turquesa-medio);
 }
 
 .reloj-local {
@@ -69,6 +98,7 @@
   font-weight: 300;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.5px;
+  color: var(--turquesa-medio);
 }
 
 .reloj-local__fecha {
@@ -125,7 +155,7 @@
   justify-content: space-between;
   gap: 14px;
   padding-top: 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  border-top: 1px solid rgba(15, 118, 110, 0.16);
 }
 
 .tarjeta__pie p {
@@ -149,7 +179,7 @@
   width: 58px;
   height: 58px;
   margin: 0 auto;
-  color: var(--acento);
+  color: var(--turquesa-medio);
 }
 
 .bienvenida h2 {
@@ -167,7 +197,7 @@
 
 /* --- Pantallas pequeñas ------------------------------------------------- */
 @media (max-width: 480px) {
-  body {
+  .pantalla-login {
     padding: 16px;
     align-items: start;
     padding-top: 8vh;
