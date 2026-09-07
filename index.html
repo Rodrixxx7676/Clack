@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clack — Inicia sesión</title>
+    <meta
+      name="description"
+      content="Clack: la hora y la temperatura de las ciudades del mundo, en un vistazo."
+    />
+
+    <!-- Estilos: primero los cimientos, luego el vidrio, luego la pantalla. -->
+    <link rel="stylesheet" href="src/estilos/base.css" />
+    <link rel="stylesheet" href="src/estilos/liquid-glass.css" />
+    <link rel="stylesheet" href="src/estilos/login.css" />
+
+    <!-- Punto de arranque de la aplicación. -->
+    <script type="module" src="src/inicio.js"></script>
+  </head>
+
+  <body>
+    <!-- Colores que flotan detrás del vidrio. Solo decoración. -->
+    <div class="fondo-liquido" aria-hidden="true">
+      <span class="fondo-liquido__burbuja fondo-liquido__burbuja--uno"></span>
+      <span class="fondo-liquido__burbuja fondo-liquido__burbuja--dos"></span>
+      <span class="fondo-liquido__burbuja fondo-liquido__burbuja--tres"></span>
+    </div>
+
+    <main class="pantalla-login">
+      <!-- ============ Tarjeta de inicio de sesión ============ -->
+      <section class="tarjeta vidrio" id="tarjetaLogin" aria-labelledby="tituloLogin">
+        <header class="tarjeta__encabezado">
+          <div class="marca">
+            <svg class="marca__icono" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="9.2" stroke="currentColor" stroke-width="1.6" />
+              <path
+                d="M12 6.8V12l3.4 2"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span>Clack</span>
+          </div>
+
+          <div class="reloj-local">
+            <p class="reloj-local__hora" id="relojHora">--:--</p>
+            <p class="reloj-local__fecha" id="relojFecha"></p>
+            <p class="reloj-local__zona" id="relojZona"></p>
+          </div>
+        </header>
+
+        <div>
+          <h1 class="titulo" id="tituloLogin">Hola de nuevo</h1>
+          <p class="subtitulo">
+            Entra para ver la hora y la temperatura de tus ciudades favoritas.
+          </p>
+        </div>
+
+        <form class="formulario" id="formularioLogin" novalidate>
+          <!-- Correo -->
+          <label class="campo" for="campoCorreo">
+            <span class="campo__etiqueta">Correo electrónico</span>
+            <div class="campo__caja">
+              <input
+                class="campo__entrada"
+                id="campoCorreo"
+                name="correo"
+                type="email"
+                inputmode="email"
+                autocomplete="email"
+                placeholder="tu@correo.com"
+                aria-describedby="errorCorreo"
+              />
+            </div>
+            <small class="campo__error" id="errorCorreo" hidden></small>
+          </label>
+
+          <!-- Contraseña -->
+          <label class="campo" for="campoContrasena">
+            <span class="campo__etiqueta">Contraseña</span>
+            <div class="campo__caja">
+              <input
+                class="campo__entrada campo__entrada--con-boton"
+                id="campoContrasena"
+                name="contrasena"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Mínimo 8 caracteres"
+                aria-describedby="errorContrasena"
+              />
+              <button
+                class="campo__boton"
+                id="botonVerContrasena"
+                type="button"
+                aria-pressed="false"
+                aria-label="Mostrar contraseña"
+              >
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+                  <path
+                    d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12Z"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linejoin="round"
+                  />
+                  <circle cx="12" cy="12" r="3.1" stroke="currentColor" stroke-width="1.6" />
+                </svg>
+              </button>
+            </div>
+            <small class="campo__error" id="errorContrasena" hidden></small>
+          </label>
+
+          <div class="formulario__opciones">
+            <label class="interruptor">
+              <input type="checkbox" id="campoRecordarme" />
+              <span class="interruptor__marca" aria-hidden="true"></span>
+              <span>Recordarme</span>
+            </label>
+            <button
+              class="enlace"
+              id="botonOlvide"
+              type="button"
+              data-correo-soporte="hola@clack.app"
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+          </div>
+
+          <p class="alerta" id="errorGeneral" role="alert" hidden></p>
+
+          <button class="boton-principal" id="botonEntrar" type="submit">
+            <span id="textoBotonEntrar">Entrar</span>
+          </button>
+        </form>
+
+        <footer class="tarjeta__pie">
+          <p>
+            ¿Solo quieres mirar?<br />
+            Usa la cuenta de prueba.
+          </p>
+          <button class="boton-vidrio" id="botonCuentaDemo" type="button">
+            Cuenta demo
+          </button>
+        </footer>
+      </section>
+
+      <!-- ============ Panel que aparece al entrar ============ -->
+      <section class="bienvenida vidrio" id="panelBienvenida" hidden aria-live="polite">
+        <svg class="bienvenida__icono" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="9.2" stroke="currentColor" stroke-width="1.5" />
+          <path
+            d="M8 12.4 10.9 15 16 9.5"
+            stroke="currentColor"
+            stroke-width="1.9"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <h2>Bienvenida, <span id="bienvenidaNombre"></span></h2>
+        <p>
+          Tu sesión está lista. El mapa de horas y temperaturas del mundo llega
+          en el siguiente paso.
+        </p>
+        <button class="boton-vidrio" id="botonSalir" type="button">Cerrar sesión</button>
+      </section>
+    </main>
+  </body>
+</html>

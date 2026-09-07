@@ -1,0 +1,18 @@
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+Icon?
+.Spotlight-V100
+.Trashes
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# Dependencias y compilados (por si más adelante hacen falta)
+node_modules/
+dist/
+
+# Configuración local del editor
+.claude/

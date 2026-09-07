@@ -1,0 +1,194 @@
+/* =====================================================================
+   login.css — Solo la pantalla de inicio de sesión.
+   Usa las piezas de liquid-glass.css y las ordena en la tarjeta.
+   ===================================================================== */
+
+.pantalla-login {
+  width: min(430px, 100%);
+  display: grid;
+  animation: aparecer 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.97);
+  }
+}
+
+.tarjeta {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  transition: opacity var(--transicion), transform var(--transicion);
+}
+
+.tarjeta--ocupada {
+  pointer-events: none;
+}
+
+.tarjeta--fuera {
+  opacity: 0;
+  transform: translateY(-14px) scale(0.97);
+  position: absolute;
+  visibility: hidden;
+}
+
+/* --- Encabezado: marca + reloj local ----------------------------------- */
+.tarjeta__encabezado {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.marca__icono {
+  width: 34px;
+  height: 34px;
+  color: var(--acento);
+}
+
+.reloj-local {
+  text-align: right;
+  line-height: 1.35;
+}
+
+.reloj-local__hora {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+}
+
+.reloj-local__fecha {
+  margin: 0;
+  font-size: 12px;
+  color: var(--texto-suave);
+}
+
+/* Solo la primera letra en mayúscula: "Domingo, 6 de septiembre". */
+.reloj-local__fecha::first-letter {
+  text-transform: uppercase;
+}
+
+.reloj-local__zona {
+  margin: 0;
+  font-size: 11px;
+  color: var(--texto-tenue);
+}
+
+/* --- Textos de bienvenida ---------------------------------------------- */
+.titulo {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.7px;
+}
+
+.subtitulo {
+  margin: 6px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+
+/* --- Formulario --------------------------------------------------------- */
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.formulario__opciones {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* --- Pie con la cuenta de prueba --------------------------------------- */
+.tarjeta__pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.tarjeta__pie p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--texto-tenue);
+}
+
+/* --- Panel de bienvenida (después de entrar) --------------------------- */
+.bienvenida {
+  padding: 40px 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: aparecer 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.bienvenida__icono {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto;
+  color: var(--acento);
+}
+
+.bienvenida h2 {
+  margin: 0;
+  font-size: 25px;
+  letter-spacing: -0.5px;
+}
+
+.bienvenida p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--texto-suave);
+}
+
+/* --- Pantallas pequeñas ------------------------------------------------- */
+@media (max-width: 480px) {
+  body {
+    padding: 16px;
+    align-items: start;
+    padding-top: 8vh;
+  }
+
+  .tarjeta {
+    padding: 24px 20px;
+    border-radius: var(--radio-medio);
+  }
+
+  .titulo {
+    font-size: 26px;
+  }
+
+  .reloj-local__hora {
+    font-size: 22px;
+  }
+
+  .tarjeta__pie {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+}

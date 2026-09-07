@@ -1,0 +1,291 @@
+/* =====================================================================
+   liquid-glass.css — Las piezas de "vidrio líquido" reutilizables:
+   tarjetas, campos de texto, botones, avisos e interruptores.
+   Se pueden usar en cualquier pantalla de Clack.
+   ===================================================================== */
+
+/* --- Superficie de vidrio ---------------------------------------------- */
+.vidrio {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04));
+  backdrop-filter: blur(var(--vidrio-desenfoque)) saturate(190%);
+  -webkit-backdrop-filter: blur(var(--vidrio-desenfoque)) saturate(190%);
+  border: 1px solid var(--vidrio-borde);
+  border-radius: var(--radio-grande);
+  box-shadow:
+    var(--sombra-flotante),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.10);
+  overflow: hidden;
+}
+
+/* Brillo que sigue al cursor (lo mueve EfectoVidrio.js). */
+.vidrio::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    45% 45% at var(--brillo-x, 50%) var(--brillo-y, 0%),
+    var(--vidrio-brillo),
+    transparent 70%
+  );
+  opacity: 0.28;
+  transition: opacity var(--transicion);
+  pointer-events: none;
+}
+
+.vidrio:hover::before {
+  opacity: 0.42;
+}
+
+/* --- Campos de texto ---------------------------------------------------- */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.campo__etiqueta {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--texto-suave);
+}
+
+.campo__caja {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.campo__entrada {
+  width: 100%;
+  padding: 15px 18px;
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--texto-principal);
+  background: var(--vidrio-fondo-suave);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  border-radius: var(--radio-medio);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transition: border-color var(--transicion), background var(--transicion),
+    box-shadow var(--transicion);
+}
+
+.campo__entrada::placeholder {
+  color: var(--texto-tenue);
+}
+
+.campo__entrada:hover {
+  background: var(--vidrio-fondo);
+}
+
+.campo__entrada:focus {
+  outline: none;
+  border-color: rgba(90, 200, 250, 0.75);
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 0 0 4px rgba(90, 200, 250, 0.18);
+}
+
+.campo__entrada--con-error {
+  border-color: rgba(255, 138, 128, 0.85);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 0 0 4px rgba(255, 69, 58, 0.16);
+}
+
+.campo__entrada--con-boton {
+  padding-right: 58px;
+}
+
+.campo__error {
+  font-size: 13px;
+  color: var(--texto-error);
+}
+
+/* Botón pequeño dentro del campo (ojo de mostrar contraseña). */
+.campo__boton {
+  position: absolute;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: var(--texto-suave);
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background var(--transicion), color var(--transicion);
+}
+
+.campo__boton:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--texto-principal);
+}
+
+/* --- Botón principal ---------------------------------------------------- */
+.boton-principal {
+  position: relative;
+  width: 100%;
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 650;
+  font-family: inherit;
+  color: #04121f;
+  background: linear-gradient(135deg, var(--acento) 0%, var(--acento-fuerte) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--radio-medio);
+  cursor: pointer;
+  box-shadow:
+    0 14px 30px rgba(10, 132, 255, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: transform var(--transicion), box-shadow var(--transicion),
+    filter var(--transicion);
+}
+
+.boton-principal:hover:not([disabled]) {
+  transform: translateY(-2px);
+  box-shadow:
+    0 20px 38px rgba(10, 132, 255, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.boton-principal:active:not([disabled]) {
+  transform: translateY(0) scale(0.99);
+}
+
+.boton-principal[disabled] {
+  cursor: progress;
+  filter: saturate(0.7) brightness(0.9);
+}
+
+.boton-principal--cargando::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  border: 2px solid rgba(4, 18, 31, 0.25);
+  border-top-color: #04121f;
+  border-radius: 50%;
+  animation: girar 700ms linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Botón secundario de vidrio ---------------------------------------- */
+.boton-vidrio {
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--texto-principal);
+  background: var(--vidrio-fondo);
+  border: 1px solid var(--vidrio-borde);
+  border-radius: var(--radio-medio);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  cursor: pointer;
+  transition: background var(--transicion), transform var(--transicion);
+}
+
+.boton-vidrio:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+/* --- Enlace discreto ---------------------------------------------------- */
+.enlace {
+  padding: 0;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--acento);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.enlace:hover {
+  text-decoration: underline;
+}
+
+/* --- Interruptor "Recordarme" ------------------------------------------ */
+.interruptor {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.interruptor input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.interruptor__marca {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  background: var(--vidrio-fondo-suave);
+  border: 1px solid var(--vidrio-borde);
+  border-radius: 999px;
+  transition: background var(--transicion);
+}
+
+.interruptor__marca::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  transition: transform var(--transicion);
+}
+
+.interruptor input:checked + .interruptor__marca {
+  background: linear-gradient(135deg, var(--acento), var(--acento-fuerte));
+}
+
+.interruptor input:checked + .interruptor__marca::after {
+  transform: translateX(18px);
+}
+
+.interruptor input:focus-visible + .interruptor__marca {
+  outline: 2px solid var(--acento);
+  outline-offset: 3px;
+}
+
+/* --- Aviso de error general -------------------------------------------- */
+.alerta {
+  margin: 0;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--texto-error);
+  background: rgba(255, 69, 58, 0.20);
+  border: 1px solid rgba(255, 138, 128, 0.45);
+  border-radius: var(--radio-medio);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
