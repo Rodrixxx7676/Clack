@@ -1,7 +1,7 @@
 # 🚀 Poner Clack en internet
 
-Guía para publicar Clack en **https://clack.kursperu.duckdns.org**
-sin tocar n8n, que ya está en producción.
+Guía para publicar Clack en su **propio dominio de DuckDNS**,
+sin rozar a n8n, que ya está en producción.
 
 ---
 
@@ -16,8 +16,8 @@ sin tocar n8n, que ya está en producción.
         │                                      │
         │      Caddy  (puertos 80 y 443)       │  ← el proxy inverso
         │         │                            │
-        │         ├── kursperu...        → n8n        (INTACTO)
-        │         └── clack.kursperu...  → :3001      👈 lo nuevo
+        │         ├── kursperu.duckdns.org  → n8n      (INTACTO)
+        │         └── TU_DOMINIO.duckdns.org → :3001   👈 Clack
         │                                      │
         └──────────────────────────────────────┘
 ```
@@ -31,31 +31,52 @@ hacerse: solo Caddy, desde dentro de la misma máquina, habla con él.
 
 ---
 
-## 🛡️ Regla número uno: n8n no se toca
+## 🛡️ Cómo se protege a n8n
 
-Clack se **agrega**, no reemplaza nada. Las cinco reglas:
+Esta vez Clack no se mete en la configuración de n8n **en absoluto**:
 
-1. **Subdominio propio.** Clack vive en `clack.kursperu.duckdns.org`.
-   El dominio de n8n no se menciona en ninguna configuración nueva.
-2. **Copia de seguridad antes de editar.** El Caddyfile se respalda con la
-   fecha en el nombre, siempre, antes de tocarlo.
-3. **Se agrega al final del archivo**, con `>>`. Nunca con `>`, que borraría
-   todo lo que hay.
-4. **Se valida antes de aplicar.** Si la configuración tiene un error, Caddy
-   lo dice y **sigue funcionando con la configuración anterior**.
-5. **`reload`, nunca `restart`.** `reload` cambia la configuración sin cortar
-   ni una sola conexión. n8n ni se entera.
+| | |
+|---|---|
+| **Dominio propio** | Clack tiene su dominio de DuckDNS. El de n8n no aparece en ninguna configuración nueva. |
+| **Archivo propio** | La configuración de Clack vive en `/etc/caddy/conf.d/clack.caddy`. El Caddyfile de n8n se toca **una sola vez**, para agregarle una línea de `import`, y nunca más. |
+| **Respaldo con fecha** | Antes de esa única línea, el Caddyfile se copia a `Caddyfile.respaldo-AAAAMMDD-HHMMSS`. |
+| **Validar antes de aplicar** | Si la configuración tuviera un error, Caddy lo dice y **sigue con la anterior**. |
+| **`reload`, no `restart`** | La configuración se cambia sin cortar ni una conexión. |
+| **Comprobación automática** | El instalador anota cómo responde n8n **antes**, y lo vuelve a mirar **después**. Si algo cambió, **deshace solo**. |
 
-> Y antes de empezar, se guarda cómo responde n8n, para poder comparar
-> después y comprobar que sigue exactamente igual.
+Si algún día quieres quitar Clack: se borra `/etc/caddy/conf.d/clack.caddy`,
+se recarga Caddy y listo. Nada más se toca.
 
 ---
 
-## 0️⃣ Primero: la radiografía
+## 1️⃣ Crear el dominio en DuckDNS
 
-Esto cambia todo lo demás, así que hay que saberlo antes: **¿Caddy está
-instalado en el servidor, o corre dentro de Docker?** (Cuando n8n se instala
-con `docker compose`, suele traer Caddy en un contenedor.)
+Entra a <https://www.duckdns.org> con tu cuenta y crea un dominio nuevo.
+La cuenta gratis permite hasta **5 dominios**.
+
+Nombres que revisé y estaban libres:
+
+| Nombre | Estado |
+|---|---|
+| `clack.duckdns.org` | 🔴 ya lo tiene otra persona |
+| `clackperu.duckdns.org` | 🟢 libre |
+| `clackapp.duckdns.org` | 🟢 libre |
+| `clackhora.duckdns.org` | 🟢 libre |
+| `clackweb.duckdns.org` | 🟢 libre |
+| `clackpe.duckdns.org` | 🟢 libre |
+
+> La comprobación definitiva es el panel de DuckDNS: si al crearlo te lo
+> acepta, era libre.
+
+**Al crearlo, ponle la IP del servidor: `34.229.198.32`**
+Y guarda tu **token** (sale arriba del panel) — lo vas a necesitar en el paso 4.
+
+---
+
+## 2️⃣ La radiografía del servidor
+
+Antes de instalar nada, hay que saber **si Caddy está instalado en el
+servidor o corre dentro de Docker**. Cambia toda la configuración.
 
 Desde tu Mac, en la carpeta del proyecto:
 
@@ -63,152 +84,101 @@ Desde tu Mac, en la carpeta del proyecto:
 ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'bash -s' < despliegue/revisar-servidor.sh
 ```
 
-Ese script **solo mira**: no instala, no modifica, no reinicia nada.
-Según lo que responda, sigue el **camino A** o el **camino B**.
+Este script **solo mira**: no instala, no modifica, no reinicia nada.
+
+* Si dice **`active`** en "¿Caddy es un servicio del sistema?" → sigue al paso 3.
+* Si aparece un **contenedor de Caddy** en Docker → avísame, la configuración
+  cambia (hay que usar `reverse_proxy clack:3001` y la red de Docker).
 
 ---
 
-## 📸 Antes de nada: la foto de n8n
+## 3️⃣ Instalar Clack
 
-Guarda cómo responde n8n ahora, para comparar al final:
+Traer el proyecto al servidor:
 
 ```bash
-curl -s -o /dev/null -w "n8n antes: %{http_code}\n" https://kursperu.duckdns.org
+ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo git clone https://github.com/Rodrixxx7676/Clack.git /opt/clack'
 ```
 
-Apunta ese número (debería ser `200`).
+Y ejecutar el instalador con **tu** dominio:
+
+```bash
+ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo bash /opt/clack/despliegue/instalar-clack.sh clackperu.duckdns.org'
+```
+
+El instalador hace todo con red de seguridad: anota cómo está n8n, instala
+Node, construye la web, enciende Clack en el 3001, respalda el Caddyfile,
+valida, recarga y comprueba que n8n siga igual. **Si algo cambió, deshace
+solo y te avisa.**
 
 ---
 
-# Camino A — Caddy instalado en el servidor (systemd)
+## 4️⃣ Que el dominio no se rompa nunca
 
-*Si la radiografía dijo `active` en "¿Caddy es un servicio del sistema?".*
+⚠️ **Esto también protege a n8n.** La IP pública de una instancia de AWS
+**cambia** cada vez que se apaga y enciende, salvo que tenga una *IP elástica*.
+Si eso pasa, `kursperu.duckdns.org` y el dominio de Clack dejan de funcionar
+los dos, y no es culpa de la configuración.
 
-### A1. Instalar Node.js (si falta)
+Hay dos formas de resolverlo, y lo ideal es tener las dos:
 
-```bash
-ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'node -v || (curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt-get install -y nodejs)'
-```
+**a) IP elástica en AWS** (recomendado): en la consola de EC2 → *Elastic IPs*
+→ asignar una y asociarla a la instancia. Así la IP nunca cambia. Es gratis
+mientras esté asociada a una instancia encendida.
 
-### A2. Traer el proyecto y construirlo
+**b) Actualizador automático de DuckDNS** (red de seguridad): un programita
+que cada 5 minutos le dice a DuckDNS cuál es la IP actual.
 
-```bash
-ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo git clone https://github.com/Rodrixxx7676/Clack.git /opt/clack && cd /opt/clack && sudo npm ci && sudo npm run build'
-```
-
-> Si el repositorio sigue privado, Git pedirá credenciales. Lo más simple es
-> hacerlo público, o crear un token en GitHub y usarlo como contraseña.
-
-### A3. Encender Clack en el puerto 3001
+Para instalarlo, primero el archivo con tu token (**este archivo nunca se
+sube a GitHub**):
 
 ```bash
-ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo cp /opt/clack/despliegue/clack.service /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now clack'
+ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo mkdir -p /etc/clack && sudo nano /etc/clack/duckdns.env'
 ```
 
-Comprobar que está vivo (desde dentro del servidor, porque el 3001 no sale a internet):
+Dentro escribe esto, con **tus** datos (los dominios van sin `.duckdns.org`):
+
+```
+DUCKDNS_DOMINIOS=clackperu,kursperu
+DUCKDNS_TOKEN=aqui-va-tu-token
+```
+
+Y luego:
 
 ```bash
-ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'curl -s http://127.0.0.1:3001/salud'
+ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo chmod 600 /etc/clack/duckdns.env && sudo cp /opt/clack/despliegue/duckdns.{service,timer} /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now duckdns.timer && sudo systemctl start duckdns.service && cat /var/log/duckdns.log'
 ```
 
-Debe responder `{"estado":"ok","aplicacion":"Clack",...}`.
-
-### A4. Respaldar el Caddyfile
-
-```bash
-ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo cp /etc/caddy/Caddyfile /etc/caddy/Caddyfile.respaldo-$(date +%Y%m%d-%H%M%S) && ls -l /etc/caddy/'
-```
-
-### A5. Agregar el bloque de Clack
-
-Fíjate en el `>>` doble: **agrega** al final, no reemplaza.
-
-```bash
-ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'cat /opt/clack/despliegue/Caddyfile.clack | sudo tee -a /etc/caddy/Caddyfile > /dev/null'
-```
-
-### A6. Validar y aplicar
-
-```bash
-ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo caddy validate --config /etc/caddy/Caddyfile && sudo systemctl reload caddy'
-```
-
-Si la validación falla, **no se aplica nada** y n8n sigue funcionando igual.
+Debe salir una línea con `OK`.
 
 ---
 
-# Camino B — Caddy dentro de Docker
-
-*Si la radiografía mostró un contenedor de Caddy.*
-
-### B1. Traer el proyecto
+## ✅ Comprobación final
 
 ```bash
-ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'git clone https://github.com/Rodrixxx7676/Clack.git ~/clack'
+echo "n8n:   $(curl -s -o /dev/null -w '%{http_code}' https://kursperu.duckdns.org)"; echo "Clack: $(curl -s -o /dev/null -w '%{http_code}' https://clackperu.duckdns.org)"
 ```
 
-### B2. Averiguar la red de n8n y ponerla en el compose
-
-```bash
-ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'docker network ls'
-```
-
-Edita `~/clack/despliegue/docker-compose.clack.yml` y cambia
-`nombre_de_la_red_de_n8n` por la red real (la que usa el contenedor de Caddy).
-
-### B3. Levantar Clack como contenedor
-
-```bash
-ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'cd ~/clack && docker compose -f despliegue/docker-compose.clack.yml up -d --build'
-```
-
-### B4. Ajustar y agregar el bloque de Caddy
-
-En `~/clack/despliegue/Caddyfile.clack`, usa la línea `reverse_proxy clack:3001`
-(por el nombre del contenedor) en vez de `127.0.0.1:3001`.
-
-Respaldar, agregar y recargar — la ruta del Caddyfile te la dijo la radiografía:
-
-```bash
-ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'cp RUTA_DEL_CADDYFILE RUTA_DEL_CADDYFILE.respaldo-$(date +%Y%m%d-%H%M%S) && cat ~/clack/despliegue/Caddyfile.clack >> RUTA_DEL_CADDYFILE && docker exec NOMBRE_CONTENEDOR_CADDY caddy reload --config /etc/caddy/Caddyfile'
-```
-
----
-
-## ✅ Comprobación final (los dos caminos)
-
-```bash
-echo "n8n:   $(curl -s -o /dev/null -w '%{http_code}' https://kursperu.duckdns.org)"; echo "Clack: $(curl -s -o /dev/null -w '%{http_code}' https://clack.kursperu.duckdns.org)"
-```
-
-Lo que debe salir:
-
-* **n8n: 200** — igual que en la foto del principio. Si cambió, algo se tocó
-  que no se debía: restaura el respaldo (ver abajo).
-* **Clack: 200** — ya está en internet. Puede tardar unos segundos la primera
-  vez, mientras Caddy pide el certificado HTTPS.
-
-Y abre <https://clack.kursperu.duckdns.org> en el navegador: debe salir el
-login con el candado 🔒.
+Los dos deben responder **200**. Y abre tu dominio en el navegador: debe
+salir el login de Clack con el candado 🔒.
 
 ---
 
 ## ↩️ Si algo sale mal: volver atrás
 
-Restaurar el Caddyfile anterior deja todo exactamente como estaba:
+El instalador ya deshace solo si detecta problemas, pero si quieres hacerlo
+a mano:
 
 ```bash
-ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'ls -t /etc/caddy/Caddyfile.respaldo-* | head -1'
+ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo rm -f /etc/caddy/conf.d/clack.caddy && sudo systemctl reload caddy && sudo systemctl stop clack'
 ```
+
+Eso quita Clack de internet y deja n8n exactamente como estaba.
+
+Para restaurar el Caddyfile completo desde el respaldo:
 
 ```bash
 ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo cp $(ls -t /etc/caddy/Caddyfile.respaldo-* | head -1) /etc/caddy/Caddyfile && sudo systemctl reload caddy'
-```
-
-Y para apagar Clack sin tocar nada más:
-
-```bash
-ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo systemctl stop clack && sudo systemctl disable clack'
 ```
 
 ---
@@ -219,7 +189,7 @@ ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo systemctl stop clack &&
 ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'cd /opt/clack && sudo git pull && sudo npm ci && sudo npm run build && sudo systemctl restart clack'
 ```
 
-Esto reinicia **solo Clack**. n8n y Caddy siguen andando.
+Reinicia **solo Clack**. n8n y Caddy siguen andando.
 
 ---
 
@@ -230,7 +200,8 @@ Esto reinicia **solo Clack**. n8n y Caddy siguen andando.
 | Clack no carga | `sudo systemctl status clack` y `sudo journalctl -u clack -n 50` |
 | Error 502 | Clack está caído: `curl http://127.0.0.1:3001/salud` |
 | No sale el candado | `sudo journalctl -u caddy -n 50` — puede ser el límite de Let's Encrypt (5 intentos por hora) |
-| **n8n dejó de responder** | Restaura el respaldo del Caddyfile (sección "volver atrás") |
+| El dominio no resuelve | `dig +short TU_DOMINIO.duckdns.org` y `cat /var/log/duckdns.log` |
+| **n8n dejó de responder** | Sección "volver atrás" — se arregla en un comando |
 
 ---
 
@@ -243,5 +214,5 @@ en el navegador. **Antes de tener usuarios de verdad** hacen falta:
 * OAuth 2.0 (Google / Microsoft) — la clave secreta va en el servidor.
 * reCAPTCHA — la clave secreta también va en el servidor.
 
-Nada de eso se sube nunca a GitHub: esas claves van en un archivo `.env`
-que se queda solo dentro del servidor.
+Esas claves van en archivos como `/etc/clack/duckdns.env`: dentro del
+servidor, con permisos `600`, y **nunca** en GitHub.

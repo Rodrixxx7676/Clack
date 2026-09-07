@@ -1,33 +1,28 @@
 # ---------------------------------------------------------------------
 # Configuración de Caddy para Clack
 # ---------------------------------------------------------------------
-# Este bloque se agrega al Caddyfile del servidor (normalmente en
-# /etc/caddy/Caddyfile), SIN borrar lo que ya está: n8n sigue igual.
+# Este archivo NO se pega dentro del Caddyfile de n8n. Va aparte, en
+# /etc/caddy/conf.d/clack.caddy, y Caddy lo carga solo.
 #
-# Qué hace:
-#   · Atiende https://clack.kursperu.duckdns.org
-#   · Pide y renueva el certificado HTTPS solo (Let's Encrypt)
-#   · Le pasa todo al servidor de Clack, que escucha en el puerto 3001
+# Ventaja: la configuración de n8n queda cerrada para siempre. Si algún
+# día hay que apagar Clack, se borra este archivo y ya está: nada más
+# se toca.
+#
+# El instalador (instalar-clack.sh) escribe este archivo con el dominio
+# que le digas, así que normalmente no hay que editarlo a mano.
 # ---------------------------------------------------------------------
 
-clack.kursperu.duckdns.org {
+DOMINIO_DE_CLACK {
 	# Comprime las respuestas: la web carga más rápido.
 	encode zstd gzip
 
-	# El proxy inverso: de internet hacia el puerto 3001.
-	#
-	# Si Caddy está instalado en el servidor (systemd), déjalo así:
+	# El proxy inverso: de internet hacia el puerto 3001 de esta máquina.
+	# Si Caddy corriera dentro de Docker, aquí iría "clack:3001".
 	reverse_proxy 127.0.0.1:3001
-	#
-	# Si Caddy corre DENTRO de Docker, comenta la línea de arriba y usa
-	# esta otra, con el nombre del contenedor de Clack:
-	# reverse_proxy clack:3001
 
 	# Cabeceras de seguridad básicas.
 	header {
-		# El navegador recuerda que este sitio es solo HTTPS.
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
-		# Evita que otras webs metan Clack dentro de un marco.
 		X-Frame-Options "SAMEORIGIN"
 		X-Content-Type-Options "nosniff"
 		Referrer-Policy "strict-origin-when-cross-origin"

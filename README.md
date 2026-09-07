@@ -53,8 +53,11 @@ Clack/
 │   └── servidor.js             ← Entrega la web en el puerto 3001
 ├── despliegue/
 │   ├── revisar-servidor.sh     ← Radiografía del servidor (solo mira)
+│   ├── instalar-clack.sh       ← Instala y publica, deshaciendo si falla
 │   ├── Caddyfile.clack         ← Config del proxy inverso (HTTPS)
 │   ├── clack.service           ← Para que arranque solo al encender
+│   ├── duckdns-actualizar.sh   ← Mantiene el dominio apuntando bien
+│   ├── duckdns.service/.timer  ← Lo ejecuta cada 5 minutos
 │   ├── Dockerfile              ← Por si Caddy corre en Docker
 │   └── docker-compose.clack.yml
 └── src/

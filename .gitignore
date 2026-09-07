@@ -20,3 +20,7 @@ dist/
 # Dependencias instaladas por npm
 node_modules/
 dist/
+
+# Claves y secretos: nunca al repositorio
+.env
+*.env

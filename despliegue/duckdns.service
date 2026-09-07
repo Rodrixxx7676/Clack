@@ -1,0 +1,11 @@
+# Se copia en /etc/systemd/system/duckdns.service
+# No se activa solo: lo dispara duckdns.timer cada 5 minutos.
+
+[Unit]
+Description=Actualizar la IP del dominio en DuckDNS
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/clack/despliegue/duckdns-actualizar.sh

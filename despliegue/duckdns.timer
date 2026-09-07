@@ -1,0 +1,13 @@
+# Se copia en /etc/systemd/system/duckdns.timer y se activa con:
+#   sudo systemctl enable --now duckdns.timer
+
+[Unit]
+Description=Revisar la IP de DuckDNS cada 5 minutos
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=5min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
