@@ -1,17 +1,29 @@
 /**
  * Ciudad.js
  * ---------
- * Una ciudad del panel: su nombre, su país, su zona horaria y su foto.
- * Sabe decir qué hora es allá, usando el Reloj que ya teníamos.
+ * Una ciudad del panel. Sabe decir qué hora es allá, usando el Reloj.
+ *
+ * Corresponde a la entidad CIUDAD de la planificación del proyecto:
+ *
+ *   ID_ZONA        →  id
+ *   NOMBRE_CIUDAD  →  nombre
+ *   PAIS           →  pais
+ *   CODIGO_ZONA    →  zonaHoraria   (nombre IANA, ej. "America/Lima")
+ *
+ * Y además, para que la app funcione:
+ *   latitud / longitud →  para consultar la temperatura
+ *   foto               →  la imagen que se ve en el carrusel
  */
 import { Reloj } from "./Reloj.js";
 
 export class Ciudad {
-  constructor({ id, nombre, pais, zonaHoraria, foto }) {
+  constructor({ id, nombre, pais, zonaHoraria, latitud, longitud, foto }) {
     this.id = id;
     this.nombre = nombre;
     this.pais = pais;
     this.zonaHoraria = zonaHoraria;
+    this.latitud = latitud;
+    this.longitud = longitud;
     this.foto = foto;
     this.reloj = new Reloj({ zonaHoraria });
   }

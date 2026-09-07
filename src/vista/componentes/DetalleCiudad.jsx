@@ -1,9 +1,11 @@
 /**
  * DetalleCiudad.jsx
  * -----------------
- * La ficha de la ciudad que está en el centro del carrusel:
- * su nombre, la hora que es allá ahora mismo y cuánto se diferencia de la tuya.
+ * La ficha de la ciudad que está en el centro del carrusel: su nombre,
+ * la hora que es allá ahora mismo y la temperatura que hace.
  */
+import IconoClima from "./IconoClima.jsx";
+
 export default function DetalleCiudad({
   nombre,
   pais,
@@ -11,6 +13,7 @@ export default function DetalleCiudad({
   fecha,
   esDeDia,
   diferenciaContigo,
+  clima,
 }) {
   return (
     <section className="detalle-ciudad vidrio" aria-live="polite">
@@ -29,11 +32,31 @@ export default function DetalleCiudad({
 
       <div className="detalle-ciudad__datos">
         <span className="etiqueta-dato">{diferenciaContigo}</span>
-        <span className="etiqueta-dato etiqueta-dato--pendiente" title="Llega en el siguiente paso">
-          Temperatura pronto
-        </span>
+        <EtiquetaDelClima clima={clima} ciudad={nombre} />
       </div>
     </section>
+  );
+}
+
+/** Los grados y el estado del cielo. Mientras llegan, muestra un aviso. */
+function EtiquetaDelClima({ clima, ciudad }) {
+  if (clima.temperatura === null) {
+    return clima.cargando ? (
+      <span className="etiqueta-dato etiqueta-dato--cargando">Buscando temperatura…</span>
+    ) : (
+      <span className="etiqueta-dato etiqueta-dato--pendiente">Sin datos del clima</span>
+    );
+  }
+
+  return (
+    <span className="etiqueta-dato etiqueta-dato--clima">
+      <IconoClima nombre={clima.icono} etiqueta={`Clima en ${ciudad}: ${clima.descripcion}`} />
+      <strong>{clima.temperatura}</strong>
+      <span className="etiqueta-dato__separador" aria-hidden="true">
+        ·
+      </span>
+      {clima.descripcion}
+    </span>
   );
 }
 

@@ -204,6 +204,43 @@
   border-style: dashed;
 }
 
+/* La etiqueta de la temperatura, con su dibujito del tiempo. */
+.etiqueta-dato--clima {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 500;
+}
+
+.etiqueta-dato--clima strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.etiqueta-dato__separador {
+  color: var(--texto-tenue);
+}
+
+.icono-clima {
+  width: 17px;
+  height: 17px;
+  color: var(--turquesa);
+}
+
+/* Mientras la temperatura viaja por internet. */
+.etiqueta-dato--cargando {
+  color: var(--texto-tenue);
+  background: rgba(15, 118, 110, 0.06);
+  border-color: transparent;
+  animation: latir 1.4s ease-in-out infinite;
+}
+
+@keyframes latir {
+  50% {
+    opacity: 0.45;
+  }
+}
+
 /* --- Pantallas pequeñas ------------------------------------------------- */
 @media (max-width: 620px) {
   .panel-inicio__contenido {
