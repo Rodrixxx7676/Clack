@@ -8,17 +8,21 @@
 # día hay que apagar Clack, se borra este archivo y ya está: nada más
 # se toca.
 #
-# El instalador (instalar-clack.sh) escribe este archivo con el dominio
-# que le digas, así que normalmente no hay que editarlo a mano.
+# El instalador (instalar-clack.sh) escribe este archivo con el dominio y
+# el puerto que le digas, así que normalmente no hay que editarlo a mano.
+#
+# Cada aplicación del servidor tendrá un archivo como este, con su propio
+# subdominio y su propio puerto. Ver el "registro de aplicaciones" en
+# DESPLIEGUE.md.
 # ---------------------------------------------------------------------
 
 DOMINIO_DE_CLACK {
 	# Comprime las respuestas: la web carga más rápido.
 	encode zstd gzip
 
-	# El proxy inverso: de internet hacia el puerto 3001 de esta máquina.
-	# Si Caddy corriera dentro de Docker, aquí iría "clack:3001".
-	reverse_proxy 127.0.0.1:3001
+	# El proxy inverso: de internet hacia el puerto de esta aplicación.
+	# Si Caddy corriera dentro de Docker, aquí iría "clack:PUERTO_DE_CLACK".
+	reverse_proxy 127.0.0.1:PUERTO_DE_CLACK
 
 	# Cabeceras de seguridad básicas.
 	header {

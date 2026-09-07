@@ -4,7 +4,11 @@
 # ---------------------------------------------------------------------
 # Cómo se usa, DENTRO del servidor:
 #
-#   sudo bash /opt/clack/despliegue/instalar-clack.sh clackperu.duckdns.org
+#   sudo bash /opt/clack/despliegue/instalar-clack.sh clack.kursperu.duckdns.org
+#
+# Y si algún día hace falta cambiarle el puerto (por defecto 3001):
+#
+#   sudo bash /opt/clack/despliegue/instalar-clack.sh clack.kursperu.duckdns.org 3005
 #
 # Qué hace, en orden:
 #   1. Anota cómo responden AHORA los sitios que ya existen (n8n incluido)
@@ -20,6 +24,7 @@
 set -euo pipefail
 
 DOMINIO="${1:-}"
+PUERTO="${2:-3001}"
 CARPETA_CLACK="${CARPETA_CLACK:-/opt/clack}"
 CADDYFILE="${CADDYFILE:-/etc/caddy/Caddyfile}"
 CARPETA_CONF="/etc/caddy/conf.d"
@@ -33,7 +38,7 @@ paso()  { printf '\n\033[1m▶ %s\033[0m\n' "$*"; }
 
 if [ -z "$DOMINIO" ]; then
   rojo "Falta el dominio."
-  echo "Uso: sudo bash $0 clackperu.duckdns.org"
+  echo "Uso: sudo bash $0 clack.kursperu.duckdns.org [puerto]"
   exit 1
 fi
 
@@ -74,20 +79,21 @@ npm ci
 npm run build
 
 # --- 3. Clack en el puerto 3001 ---------------------------------------
-paso "Encendiendo Clack en el puerto 3001"
+paso "Encendiendo Clack en el puerto $PUERTO"
 cp "$CARPETA_CLACK/despliegue/clack.service" /etc/systemd/system/clack.service
 sed -i "s|WorkingDirectory=.*|WorkingDirectory=$CARPETA_CLACK|" /etc/systemd/system/clack.service
+sed -i "s|Environment=PORT=.*|Environment=PORT=$PUERTO|" /etc/systemd/system/clack.service
 systemctl daemon-reload
 systemctl enable --now clack
 systemctl restart clack
 sleep 2
 
-if ! curl -sf --max-time 10 http://127.0.0.1:3001/salud > /dev/null; then
-  rojo "Clack no responde en el puerto 3001."
+if ! curl -sf --max-time 10 "http://127.0.0.1:$PUERTO/salud" > /dev/null; then
+  rojo "Clack no responde en el puerto $PUERTO."
   echo "Mira qué pasó con:  journalctl -u clack -n 40"
   exit 1
 fi
-verde "   Clack responde en el 3001 ✓"
+verde "   Clack responde en el $PUERTO ✓"
 
 # --- 4 y 5. Configuración de Caddy, en un archivo aparte --------------
 paso "Configurando Caddy para $DOMINIO"
@@ -95,7 +101,7 @@ mkdir -p "$CARPETA_CONF" /var/log/caddy
 cp "$CADDYFILE" "$RESPALDO"
 echo "   Respaldo guardado en: $RESPALDO"
 
-sed "s|DOMINIO_DE_CLACK|$DOMINIO|" \
+sed -e "s|DOMINIO_DE_CLACK|$DOMINIO|" -e "s|PUERTO_DE_CLACK|$PUERTO|" \
   "$CARPETA_CLACK/despliegue/Caddyfile.clack" > "$CONFIG_CLACK"
 
 # La línea de import se agrega UNA sola vez, y nunca más se toca el archivo.

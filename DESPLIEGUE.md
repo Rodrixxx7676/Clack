@@ -1,35 +1,66 @@
 # 🚀 Poner Clack en internet
 
-Guía para publicar Clack en su **propio dominio de DuckDNS**,
-sin rozar a n8n, que ya está en producción.
+Guía para publicar Clack en **https://clack.kursperu.duckdns.org**, dejando
+el servidor listo para alojar varias aplicaciones con un solo proxy inverso
+y sin rozar a n8n, que ya está en producción.
 
 ---
 
 ## 🗺️ Cómo va a funcionar
 
+Un solo servidor y un solo proxy inverso para **todas** tus aplicaciones.
+Cada una vive en su propio subdominio y su propio puerto:
+
 ```
-                    Internet
-                       │
-                       ▼
-        ┌──────────────────────────────────────┐
-        │      Servidor AWS 34.229.198.32      │
-        │                                      │
-        │      Caddy  (puertos 80 y 443)       │  ← el proxy inverso
-        │         │                            │
-        │         ├── kursperu.duckdns.org  → n8n      (INTACTO)
-        │         └── TU_DOMINIO.duckdns.org → :3001   👈 Clack
-        │                                      │
-        └──────────────────────────────────────┘
+                         Internet
+                            │
+                            ▼
+        ┌───────────────────────────────────────────────┐
+        │         Servidor AWS 34.229.198.32            │
+        │                                               │
+        │         Caddy  (puertos 80 y 443)             │  ← el único que sale a internet
+        │            │                                  │
+        │            ├── kursperu.duckdns.org       → n8n    :5678  (INTACTO)
+        │            ├── clack.kursperu.duckdns.org → Clack  :3001  👈
+        │            └── otra.kursperu.duckdns.org  → app #3 :3002  (mañana)
+        │                                               │
+        └───────────────────────────────────────────────┘
 ```
 
-**El proxy inverso** es Caddy: el único que se asoma a internet. Recibe las
-visitas, se encarga del candado 🔒 y se las pasa al servidor de Clack, que
-vive escondido en el puerto 3001.
+**No hace falta crear dominios nuevos.** DuckDNS acepta cualquier
+sub-subdominio automáticamente: `loquesea.kursperu.duckdns.org` ya apunta a
+tu servidor sin que tengas que registrarlo. Caddy le pide un certificado
+HTTPS propio a cada uno, solo.
 
-El puerto 3001 **no se abre en el firewall de AWS**. No hace falta y no debe
-hacerse: solo Caddy, desde dentro de la misma máquina, habla con él.
+### ¿Por qué un subdominio por app y no una carpeta?
 
----
+Se podría hacer `kursperu.duckdns.org/clack`, pero un subdominio es mejor:
+
+| | Subdominio (`clack.kursperu...`) | Carpeta (`.../clack`) |
+|---|---|---|
+| Configurar la app | Nada que tocar | Hay que decirle a React y a Vite que vive en `/clack` |
+| Sesiones y cookies | Aisladas por app | **Compartidas**: un fallo en una app expone a las otras |
+| OAuth 2.0 (Google) | Dirección de retorno limpia | Se complica |
+| Certificado HTTPS | Uno por app, automático | Uno solo |
+
+La única ventaja de la carpeta es el certificado único, y como Caddy los
+gestiona solo, no es ninguna ventaja.
+
+### Registro de aplicaciones
+
+Cada app nueva toma el siguiente puerto libre. Anótalas aquí para no
+repetir ninguno:
+
+| Aplicación | Subdominio | Puerto | Estado |
+|---|---|---|---|
+| n8n | `kursperu.duckdns.org` | 5678 *(por confirmar)* | 🟢 En producción |
+| **Clack** | `clack.kursperu.duckdns.org` | **3001** | 🟡 Por instalar |
+| *(libre)* | | 3002 | |
+| *(libre)* | | 3003 | |
+
+Ningún puerto de estos se abre en el firewall de AWS: solo el 80 y el 443,
+que ya están abiertos. Las aplicaciones escuchan en `127.0.0.1`, así que
+únicamente Caddy, desde dentro de la máquina, puede hablarles.
 
 ## 🛡️ Cómo se protege a n8n
 
@@ -49,29 +80,24 @@ se recarga Caddy y listo. Nada más se toca.
 
 ---
 
-## 1️⃣ Crear el dominio en DuckDNS
+## 1️⃣ El dominio: no hay que hacer nada
 
-Entra a <https://www.duckdns.org> con tu cuenta y crea un dominio nuevo.
-La cuenta gratis permite hasta **5 dominios**.
+`clack.kursperu.duckdns.org` **ya funciona**. Compruébalo:
 
-Nombres que revisé y estaban libres:
+```bash
+dig +short clack.kursperu.duckdns.org
+```
 
-| Nombre | Estado |
-|---|---|
-| `clack.duckdns.org` | 🔴 ya lo tiene otra persona |
-| `clackperu.duckdns.org` | 🟢 libre |
-| `clackapp.duckdns.org` | 🟢 libre |
-| `clackhora.duckdns.org` | 🟢 libre |
-| `clackweb.duckdns.org` | 🟢 libre |
-| `clackpe.duckdns.org` | 🟢 libre |
+Debe responder `34.229.198.32`. DuckDNS resuelve cualquier sub-subdominio
+al mismo sitio que el dominio padre, sin registrarlo.
 
-> La comprobación definitiva es el panel de DuckDNS: si al crearlo te lo
-> acepta, era libre.
-
-**Al crearlo, ponle la IP del servidor: `34.229.198.32`**
-Y guarda tu **token** (sale arriba del panel) — lo vas a necesitar en el paso 4.
-
----
+> **¿Prefieres un nombre paraguas más neutro?** Se puede crear un dominio
+> nuevo en <https://www.duckdns.org> (la cuenta gratis permite 5) y usar
+> `clack.kursapps.duckdns.org`. Revisé la disponibilidad:
+> `aplicaciones`, `apps`, `plataforma` y `servicios` **ya están tomados**;
+> `kursapps` y `appsperu` estaban libres.
+> Si lo creas, ponle la IP `34.229.198.32` y cambia el dominio en el
+> comando del paso 3. Todo lo demás es idéntico.
 
 ## 2️⃣ La radiografía del servidor
 
@@ -103,8 +129,11 @@ ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo git clone https://githu
 Y ejecutar el instalador con **tu** dominio:
 
 ```bash
-ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo bash /opt/clack/despliegue/instalar-clack.sh clackperu.duckdns.org'
+ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo bash /opt/clack/despliegue/instalar-clack.sh clack.kursperu.duckdns.org'
 ```
+
+El instalador acepta un segundo dato opcional, el puerto, por si algún día
+el 3001 se ocupa: `... instalar-clack.sh clack.kursperu.duckdns.org 3005`
 
 El instalador hace todo con red de seguridad: anota cómo está n8n, instala
 Node, construye la web, enciende Clack en el 3001, respalda el Caddyfile,
@@ -117,8 +146,8 @@ solo y te avisa.**
 
 ⚠️ **Esto también protege a n8n.** La IP pública de una instancia de AWS
 **cambia** cada vez que se apaga y enciende, salvo que tenga una *IP elástica*.
-Si eso pasa, `kursperu.duckdns.org` y el dominio de Clack dejan de funcionar
-los dos, y no es culpa de la configuración.
+Si eso pasa, **todas** tus aplicaciones desaparecen de internet a la vez
+—n8n incluido— y no es culpa de la configuración.
 
 Hay dos formas de resolverlo, y lo ideal es tener las dos:
 
@@ -136,10 +165,12 @@ sube a GitHub**):
 ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo mkdir -p /etc/clack && sudo nano /etc/clack/duckdns.env'
 ```
 
-Dentro escribe esto, con **tus** datos (los dominios van sin `.duckdns.org`):
+Dentro escribe esto, con **tus** datos. Va solo `kursperu`, sin
+`.duckdns.org` y sin los sub-subdominios: al actualizar el dominio padre,
+todos sus hijos (Clack incluido) se actualizan con él.
 
 ```
-DUCKDNS_DOMINIOS=clackperu,kursperu
+DUCKDNS_DOMINIOS=kursperu
 DUCKDNS_TOKEN=aqui-va-tu-token
 ```
 
@@ -156,7 +187,7 @@ Debe salir una línea con `OK`.
 ## ✅ Comprobación final
 
 ```bash
-echo "n8n:   $(curl -s -o /dev/null -w '%{http_code}' https://kursperu.duckdns.org)"; echo "Clack: $(curl -s -o /dev/null -w '%{http_code}' https://clackperu.duckdns.org)"
+echo "n8n:   $(curl -s -o /dev/null -w '%{http_code}' https://kursperu.duckdns.org)"; echo "Clack: $(curl -s -o /dev/null -w '%{http_code}' https://clack.kursperu.duckdns.org)"
 ```
 
 Los dos deben responder **200**. Y abre tu dominio en el navegador: debe
@@ -200,8 +231,26 @@ Reinicia **solo Clack**. n8n y Caddy siguen andando.
 | Clack no carga | `sudo systemctl status clack` y `sudo journalctl -u clack -n 50` |
 | Error 502 | Clack está caído: `curl http://127.0.0.1:3001/salud` |
 | No sale el candado | `sudo journalctl -u caddy -n 50` — puede ser el límite de Let's Encrypt (5 intentos por hora) |
-| El dominio no resuelve | `dig +short TU_DOMINIO.duckdns.org` y `cat /var/log/duckdns.log` |
+| El dominio no resuelve | `dig +short clack.kursperu.duckdns.org` y `cat /var/log/duckdns.log` |
 | **n8n dejó de responder** | Sección "volver atrás" — se arregla en un comando |
+
+---
+
+## ➕ Cómo agregar la siguiente aplicación
+
+Cuando tengas otra app lista, el patrón se repite y **Clack no se entera**:
+
+1. Elige subdominio y puerto libres, y anótalos en el registro de arriba.
+2. Que la app escuche en `127.0.0.1` en su puerto (nunca en `0.0.0.0`, para
+   que no se asome a internet).
+3. Crea su servicio en `/etc/systemd/system/<app>.service`, igual que
+   `clack.service`.
+4. Crea `/etc/caddy/conf.d/<app>.caddy` copiando `clack.caddy` y cambiando
+   el dominio y el puerto.
+5. `sudo caddy validate --config /etc/caddy/Caddyfile && sudo systemctl reload caddy`
+
+El Caddyfile principal **ya no se toca nunca más**: la línea de `import`
+carga sola cada archivo nuevo de `conf.d/`.
 
 ---
 
