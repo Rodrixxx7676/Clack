@@ -73,6 +73,14 @@ body {
   }
 }
 
+/* Aparición suave de las pantallas. */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.97);
+  }
+}
+
 :focus-visible {
   outline: 2px solid var(--acento-fuerte);
   outline-offset: 3px;

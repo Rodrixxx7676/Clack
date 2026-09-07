@@ -3,8 +3,8 @@
 Una página web para ver **la hora y la temperatura de las ciudades del mundo**,
 hecha en **React**, con diseño *Liquid Glass* en **blanco y turquesa**.
 
-> **Estado actual: Paso 1 — Pantalla de inicio de sesión (Login).**
-> Las pantallas del reloj mundial y del clima llegan en los siguientes pasos.
+> **Estado actual: Paso 2 — Login + panel de inicio con el carrusel de ciudades.**
+> La temperatura de cada ciudad llega en el siguiente paso.
 
 ---
 
@@ -46,30 +46,42 @@ Clack/
 ├── vite.config.js              ← Configuración del servidor de desarrollo
 └── src/
     ├── main.jsx                ← Enciende React y carga los estilos
-    ├── App.jsx                 ← La raíz: decide qué pantalla se ve
+    ├── App.jsx                 ← La raíz: sin sesión muestra el Login,
+    │                             con sesión muestra el panel de inicio
     │
     ├── modelo/                 ← 1. MODELO: los datos y las reglas
     │   ├── Usuario.js               Quién es la persona que entra
     │   ├── ValidadorCredenciales.js Qué correo y contraseña son válidos
     │   ├── ServicioAutenticacion.js Entrar y salir de la app
-    │   └── Reloj.js                 Dar la hora con formato bonito
+    │   ├── Reloj.js                 Dar la hora con formato bonito
+    │   ├── Ciudad.js                Una ciudad y qué hora es allá
+    │   └── catalogoDeCiudades.js    👈 La lista de ciudades del panel
     │
     ├── vista-modelo/           ← 2. VIEWMODEL: el cerebro de cada pantalla
+    │   ├── useSesion.js             Quién está conectado ahora
     │   ├── useLoginViewModel.js     Estado del formulario de login
-    │   └── useRelojLocal.js         La hora local, siempre al día
+    │   ├── usePanelInicioViewModel.js  Ciudades y cuál está enfocada
+    │   ├── useMomentoActual.js      El "latido": la hora, cada segundo
+    │   └── useRelojLocal.js         La hora de tu dispositivo
     │
     ├── vista/                  ← 3. VISTA: lo que se ve y se toca
-    │   ├── PantallaLogin.jsx        Arma la pantalla completa
+    │   ├── PantallaLogin.jsx        La pantalla de inicio de sesión
+    │   ├── PanelInicio.jsx          La pantalla principal
     │   ├── componentes/             Piezas sueltas y reutilizables
     │   │   ├── MarcaClack.jsx           Logo y nombre
     │   │   ├── RelojLocal.jsx           Hora, fecha y zona horaria
     │   │   ├── CampoTexto.jsx           Un campo del formulario
     │   │   ├── CampoContrasena.jsx      Campo con el ojo de "mostrar"
     │   │   ├── InterruptorRecordarme.jsx
-    │   │   └── PanelBienvenida.jsx      Lo que se ve al entrar
+    │   │   ├── EncabezadoPanel.jsx      Barra de arriba del panel
+    │   │   └── DetalleCiudad.jsx        Ficha de la ciudad enfocada
+    │   ├── carruseles/
+    │   │   ├── CarruselCiudades.jsx     Configura el carrusel
+    │   │   ├── DepthCarousel.jsx        Motor de React Bits ⚠️ no tocar
+    │   │   └── DepthCarousel.css
     │   ├── fondos/
-    │   │   ├── FondoWebThreads.jsx      Configura el fondo (colores, forma)
-    │   │   ├── WebThreads.jsx           Motor gráfico de React Bits ⚠️ no tocar
+    │   │   ├── FondoWebThreads.jsx      Configura el fondo animado
+    │   │   ├── WebThreads.jsx           Motor de React Bits ⚠️ no tocar
     │   │   └── WebThreads.css
     │   └── efectos/
     │       └── useBrilloCursor.js       El brillo que sigue al cursor
@@ -77,7 +89,8 @@ Clack/
     └── estilos/                ← El aspecto visual
         ├── base.css                 Colores de la marca y tipografía
         ├── liquid-glass.css         Las piezas de vidrio reutilizables
-        └── login.css                Solo la pantalla de login
+        ├── login.css                Solo la pantalla de login
+        └── panel-inicio.css         Solo el panel de inicio
 ```
 
 ### Cómo se hablan las capas
@@ -98,7 +111,23 @@ Gracias a eso, cuando conectemos un servidor real solo cambia
 
 > 💡 En React, el ViewModel de MVVM se escribe como un **hook**
 > (una función que empieza con `use`). Por eso los archivos se llaman
-> `useLoginViewModel.js` y `useRelojLocal.js`.
+> `useLoginViewModel.js`, `useSesion.js` o `useRelojLocal.js`.
+
+### ➕ Cómo agregar una ciudad
+
+Abre `src/modelo/catalogoDeCiudades.js`, copia uno de los bloques y cambia
+el nombre, el país, la zona horaria y la foto. Nada más: el carrusel y la
+ficha de la hora se actualizan solos.
+
+```js
+new Ciudad({
+  id: "madrid",
+  nombre: "Madrid",
+  pais: "España",
+  zonaHoraria: "Europe/Madrid",   // nombre oficial IANA
+  foto: "https://...",
+}),
+```
 
 ---
 
@@ -107,6 +136,13 @@ Gracias a eso, cuando conectemos un servidor real solo cambia
 **Paleta:** blanco de fondo, turquesa para todo lo importante.
 Todos los colores viven en variables CSS dentro de `src/estilos/base.css`:
 cambiando ahí, cambia toda la app.
+
+**Carrusel de ciudades:** el componente
+[`DepthCarousel`](https://reactbits.dev/components/depth-carousel) de React Bits,
+que apila las tarjetas en profundidad. Se puede arrastrar, girar con la rueda
+del mouse, con las flechas del teclado o dejarlo andar solo. Cuando cambia la
+tarjeta del centro avisa al ViewModel, y la ficha de abajo muestra la hora de
+esa ciudad. Las fotos son de Wikimedia Commons.
 
 **Fondo animado:** el componente [`WebThreads`](https://reactbits.dev/backgrounds/web-threads)
 de React Bits, en su modo claro (`lightMode`), pintando hilos turquesa sobre
@@ -124,7 +160,7 @@ sombras suaves en turquesa. Respeta `prefers-reduced-motion`.
 ## 🛣️ Próximos pasos
 
 - [x] **Paso 1 —** Login en React, Liquid Glass blanco + turquesa, fondo WebThreads.
-- [ ] **Paso 2 —** Panel principal con el reloj de varias ciudades.
+- [x] **Paso 2 —** Panel de inicio con el carrusel de ciudades y su hora en vivo.
 - [ ] **Paso 3 —** Temperatura actual de cada ciudad.
 - [ ] **Paso 4 —** Buscar y guardar ciudades favoritas.
 
@@ -140,6 +176,11 @@ No sirve para proteger información real todavía.
 
 ## 🙏 Créditos
 
-Fondo animado: [WebThreads](https://reactbits.dev/backgrounds/web-threads) de
-[React Bits](https://reactbits.dev), que usa la librería
-[`ogl`](https://github.com/oframe/ogl) para dibujar con WebGL.
+Componentes de [React Bits](https://reactbits.dev):
+
+* [WebThreads](https://reactbits.dev/backgrounds/web-threads) — el fondo animado,
+  dibujado con WebGL gracias a [`ogl`](https://github.com/oframe/ogl).
+* [DepthCarousel](https://reactbits.dev/components/depth-carousel) — el carrusel
+  de ciudades, animado con [`gsap`](https://gsap.com).
+
+Fotos de las ciudades: [Wikimedia Commons](https://commons.wikimedia.org).

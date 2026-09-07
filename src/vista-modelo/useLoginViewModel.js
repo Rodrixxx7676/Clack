@@ -6,15 +6,15 @@
  * En React, el ViewModel de MVVM se escribe como un hook: guarda el estado
  * de la pantalla y las acciones que se pueden hacer en ella.
  * No sabe nada de HTML ni de estilos: solo devuelve datos y funciones.
+ *
+ * Quién queda conectado NO se decide aquí, sino en useSesion (App.jsx).
+ * Este hook solo recibe la función `entrar` y avisa si algo salió mal.
  */
 import { useCallback, useState } from "react";
 import { ServicioAutenticacion } from "../modelo/ServicioAutenticacion.js";
 import { revisarCorreo, revisarContrasena } from "../modelo/ValidadorCredenciales.js";
 
-// Una sola instancia para toda la app.
-const servicioPorDefecto = new ServicioAutenticacion();
-
-export function useLoginViewModel(servicio = servicioPorDefecto) {
+export function useLoginViewModel({ entrar }) {
   // Lo que el usuario escribe.
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
@@ -25,9 +25,6 @@ export function useLoginViewModel(servicio = servicioPorDefecto) {
   const [errorContrasena, setErrorContrasena] = useState(null);
   const [errorGeneral, setErrorGeneral] = useState(null);
   const [cargando, setCargando] = useState(false);
-
-  // Quién entró (null mientras nadie ha entrado).
-  const [usuarioConectado, setUsuarioConectado] = useState(() => servicio.recuperarSesion());
 
   const escribirCorreo = useCallback((texto) => {
     setCorreo(texto);
@@ -71,24 +68,13 @@ export function useLoginViewModel(servicio = servicioPorDefecto) {
     setCargando(true);
     setErrorGeneral(null);
     try {
-      const usuario = await servicio.iniciarSesion({ correo, contrasena, recordarme });
-      setUsuarioConectado(usuario);
+      await entrar({ correo, contrasena, recordarme });
+      // Si todo salió bien, App.jsx cambia solo a la pantalla del panel.
     } catch (error) {
       setErrorGeneral(error.message);
-    } finally {
       setCargando(false);
     }
-  }, [cargando, contrasena, correo, recordarme, servicio]);
-
-  const cerrarSesion = useCallback(() => {
-    servicio.cerrarSesion();
-    setUsuarioConectado(null);
-    setCorreo("");
-    setContrasena("");
-    setErrorCorreo(null);
-    setErrorContrasena(null);
-    setErrorGeneral(null);
-  }, [servicio]);
+  }, [cargando, contrasena, correo, entrar, recordarme]);
 
   const mostrarAyudaContrasena = useCallback((correoSoporte) => {
     setErrorGeneral(`Escríbenos a ${correoSoporte} y te ayudamos a recuperarla.`);
@@ -103,7 +89,6 @@ export function useLoginViewModel(servicio = servicioPorDefecto) {
     errorContrasena,
     errorGeneral,
     cargando,
-    usuarioConectado,
     puedeEnviar: correo.trim().length > 0 && contrasena.length > 0,
     // Acciones
     escribirCorreo,
@@ -113,7 +98,6 @@ export function useLoginViewModel(servicio = servicioPorDefecto) {
     validarContrasenaAlSalir,
     usarCuentaDemo,
     iniciarSesion,
-    cerrarSesion,
     mostrarAyudaContrasena,
   };
 }

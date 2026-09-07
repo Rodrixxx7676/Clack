@@ -1,9 +1,20 @@
 /**
  * App.jsx — La raíz de la aplicación.
- * Hoy solo existe el Login; aquí irán las demás pantallas de Clack.
+ *
+ * Decide qué pantalla se ve:
+ *   · sin usuario  → la pantalla de Login
+ *   · con usuario  → el panel de inicio
  */
+import { useSesion } from "./vista-modelo/useSesion.js";
 import PantallaLogin from "./vista/PantallaLogin.jsx";
+import PanelInicio from "./vista/PanelInicio.jsx";
 
 export default function App() {
-  return <PantallaLogin />;
+  const sesion = useSesion();
+
+  if (!sesion.usuario) {
+    return <PantallaLogin alEntrar={sesion.entrar} />;
+  }
+
+  return <PanelInicio usuario={sesion.usuario} alCerrarSesion={sesion.salir} />;
 }

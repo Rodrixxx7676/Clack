@@ -1,0 +1,250 @@
+/* =====================================================================
+   panel-inicio.css — La pantalla principal: encabezado, carrusel de
+   ciudades y la ficha de la ciudad enfocada.
+   Aquí también se viste el carrusel de React Bits con los colores de Clack.
+   ===================================================================== */
+
+.panel-inicio {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-inicio__contenido {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  width: min(1080px, 100%);
+  margin: 0 auto;
+  padding: 18px 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: aparecer 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.panel-inicio__centro {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.panel-inicio__introduccion {
+  margin: 0;
+  font-size: 14px;
+  color: var(--texto-suave);
+  text-align: center;
+}
+
+/* --- Encabezado --------------------------------------------------------- */
+.encabezado-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  border-radius: var(--radio-medio);
+}
+
+.encabezado-panel__usuario {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  line-height: 1.35;
+}
+
+.encabezado-panel__saludo {
+  margin: 0;
+  font-size: 15px;
+}
+
+.encabezado-panel__hora {
+  margin: 0;
+  font-size: 12px;
+  color: var(--texto-tenue);
+}
+
+/* --- Carrusel de ciudades ---------------------------------------------- */
+.carrusel-ciudades {
+  width: 100%;
+  height: clamp(400px, 52vh, 500px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Se reserva una franja abajo para los puntitos, así no quedan
+   encima de la foto. */
+.carrusel-ciudades .depth-carousel__stage {
+  inset: 0 0 44px 0;
+}
+
+/* Las tarjetas, con sombra turquesa en vez de negra. */
+.carrusel-ciudades .depth-carousel__card {
+  background: #e2f5f2;
+  box-shadow:
+    0 30px 60px -22px rgba(7, 63, 60, 0.42),
+    0 8px 20px -10px rgba(7, 63, 60, 0.28);
+}
+
+/* Las flechas de los lados: vidrio blanco con el turquesa de la marca. */
+.carrusel-ciudades .depth-carousel__arrow {
+  color: var(--turquesa-medio);
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(15, 118, 110, 0.22);
+  box-shadow: 0 8px 20px rgba(7, 63, 60, 0.14);
+}
+
+.carrusel-ciudades .depth-carousel__arrow:hover {
+  background: #ffffff;
+  border-color: var(--turquesa);
+}
+
+/* Los puntitos de abajo. */
+.carrusel-ciudades .depth-carousel__dots {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(15, 118, 110, 0.14);
+}
+
+.carrusel-ciudades .depth-carousel__dot {
+  background: rgba(15, 118, 110, 0.3);
+}
+
+.carrusel-ciudades .depth-carousel__dot.is-active {
+  background: var(--turquesa-medio);
+}
+
+.carrusel-ciudades .depth-carousel:focus-visible {
+  outline: 2px solid var(--acento-fuerte);
+}
+
+/* --- Ficha de la ciudad enfocada --------------------------------------- */
+.detalle-ciudad {
+  width: min(560px, 100%);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  border-radius: var(--radio-medio);
+}
+
+.detalle-ciudad__nombre {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.detalle-ciudad__pais {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.detalle-ciudad__reloj {
+  text-align: right;
+}
+
+.detalle-ciudad__hora {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 0;
+  font-size: 34px;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+  color: var(--turquesa-medio);
+}
+
+.detalle-ciudad__icono {
+  width: 22px;
+  height: 22px;
+  color: var(--turquesa);
+}
+
+.detalle-ciudad__fecha {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--texto-tenue);
+}
+
+.detalle-ciudad__fecha::first-letter {
+  text-transform: uppercase;
+}
+
+.detalle-ciudad__datos {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 12px;
+  border-top: 1px solid rgba(15, 118, 110, 0.16);
+}
+
+/* Pequeñas etiquetas con un dato suelto. */
+.etiqueta-dato {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--turquesa-medio);
+  background: rgba(20, 184, 166, 0.12);
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  border-radius: 999px;
+}
+
+.etiqueta-dato--pendiente {
+  color: var(--texto-tenue);
+  background: rgba(15, 118, 110, 0.06);
+  border-style: dashed;
+}
+
+/* --- Pantallas pequeñas ------------------------------------------------- */
+@media (max-width: 620px) {
+  .panel-inicio__contenido {
+    padding: 14px 14px 24px;
+    gap: 14px;
+  }
+
+  /* En el móvil: arriba la marca y el botón, y el saludo debajo. */
+  .encabezado-panel {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .encabezado-panel__usuario {
+    order: 3;
+    flex-basis: 100%;
+    text-align: center;
+  }
+
+  .carrusel-ciudades {
+    height: clamp(340px, 46vh, 420px);
+  }
+
+  .detalle-ciudad {
+    padding: 18px 20px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .detalle-ciudad__reloj,
+  .detalle-ciudad__lugar {
+    width: 100%;
+    text-align: center;
+  }
+
+  .detalle-ciudad__hora {
+    justify-content: center;
+  }
+
+  .detalle-ciudad__datos {
+    justify-content: center;
+  }
+}

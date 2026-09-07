@@ -1,22 +1,15 @@
 /**
  * useRelojLocal.js
  * ----------------
- * Mantiene la hora local siempre al día para mostrarla en pantalla.
- * Es el primer ladrillo del reloj mundial que vendrá después.
+ * La hora del dispositivo, siempre al día, lista para mostrarse.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Reloj } from "../modelo/Reloj.js";
-
-const UN_SEGUNDO = 1000;
+import { useMomentoActual } from "./useMomentoActual.js";
 
 export function useRelojLocal(zonaHoraria = undefined) {
   const reloj = useMemo(() => new Reloj({ zonaHoraria }), [zonaHoraria]);
-  const [momento, setMomento] = useState(() => new Date());
-
-  useEffect(() => {
-    const temporizador = setInterval(() => setMomento(new Date()), UN_SEGUNDO);
-    return () => clearInterval(temporizador); // se limpia al salir de la pantalla
-  }, []);
+  const momento = useMomentoActual();
 
   return {
     hora: reloj.hora(momento),

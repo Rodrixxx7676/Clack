@@ -14,6 +14,7 @@ import App from "./App.jsx";
 import "./estilos/base.css";
 import "./estilos/liquid-glass.css";
 import "./estilos/login.css";
+import "./estilos/panel-inicio.css";
 
 createRoot(document.getElementById("raiz")).render(
   <React.StrictMode>

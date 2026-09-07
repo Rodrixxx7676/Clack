@@ -44,13 +44,6 @@
   animation: aparecer 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes aparecer {
-  from {
-    opacity: 0;
-    transform: translateY(22px) scale(0.97);
-  }
-}
-
 /* --- Tarjeta ------------------------------------------------------------ */
 .tarjeta {
   padding: 32px;
