@@ -52,8 +52,11 @@ Clack/
 ├── servidor/
 │   └── servidor.js             ← Entrega la web en el puerto 3001
 ├── despliegue/
+│   ├── revisar-servidor.sh     ← Radiografía del servidor (solo mira)
 │   ├── Caddyfile.clack         ← Config del proxy inverso (HTTPS)
-│   └── clack.service           ← Para que arranque solo al encender
+│   ├── clack.service           ← Para que arranque solo al encender
+│   ├── Dockerfile              ← Por si Caddy corre en Docker
+│   └── docker-compose.clack.yml
 └── src/
     ├── main.jsx                ← Enciende React y carga los estilos
     ├── App.jsx                 ← La raíz: sin sesión muestra el Login,

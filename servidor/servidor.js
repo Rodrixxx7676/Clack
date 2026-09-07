@@ -24,6 +24,13 @@ const CARPETA_WEB = path.join(CARPETA_DE_ESTE_ARCHIVO, "..", "dist");
 // El puerto se puede cambiar sin tocar el código: PORT=4000 npm run servidor
 const PUERTO = Number(process.env.PORT) || 3001;
 
+// Dónde escucha:
+//   · 127.0.0.1 (por defecto) → solo desde la propia máquina. Es lo seguro
+//     cuando Caddy está instalado en el mismo servidor.
+//   · 0.0.0.0 → también desde la red interna. Hace falta si Clack corre
+//     dentro de un contenedor Docker, para que Caddy pueda alcanzarlo.
+const DIRECCION = process.env.HOST || "127.0.0.1";
+
 const app = express();
 
 // Caddy va delante: así el servidor sabe la IP real de quien visita.
@@ -60,7 +67,7 @@ app.get("*", (peticion, respuesta) => {
   respuesta.sendFile(path.join(CARPETA_WEB, "index.html"));
 });
 
-app.listen(PUERTO, "127.0.0.1", () => {
-  console.log(`Clack escuchando en http://127.0.0.1:${PUERTO}`);
+app.listen(PUERTO, DIRECCION, () => {
+  console.log(`Clack escuchando en http://${DIRECCION}:${PUERTO}`);
   console.log(`Sirviendo la carpeta: ${CARPETA_WEB}`);
 });
