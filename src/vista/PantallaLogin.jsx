@@ -10,8 +10,8 @@
  */
 import { useLoginViewModel } from "../vista-modelo/useLoginViewModel.js";
 import { useRelojLocal } from "../vista-modelo/useRelojLocal.js";
-import { useBrilloCursor } from "./efectos/useBrilloCursor.js";
 import FondoWebThreads from "./fondos/FondoWebThreads.jsx";
+import CajaVidrio from "./componentes/CajaVidrio.jsx";
 import MarcaClack from "./componentes/MarcaClack.jsx";
 import RelojLocal from "./componentes/RelojLocal.jsx";
 import CampoTexto from "./componentes/CampoTexto.jsx";
@@ -23,7 +23,6 @@ const CORREO_SOPORTE = "hola@clack.app";
 export default function PantallaLogin({ alEntrar }) {
   const vm = useLoginViewModel({ entrar: alEntrar });
   const reloj = useRelojLocal();
-  const brillo = useBrilloCursor();
 
   const enviarFormulario = (evento) => {
     evento.preventDefault();
@@ -35,10 +34,11 @@ export default function PantallaLogin({ alEntrar }) {
       <FondoWebThreads />
 
       <main className="pantalla-login__contenido">
-        <section
-          className={"tarjeta vidrio" + (vm.cargando ? " tarjeta--ocupada" : "")}
+        <CajaVidrio
+          className={"tarjeta" + (vm.cargando ? " tarjeta--ocupada" : "")}
+          radio={32}
+          como="section"
           aria-labelledby="tituloLogin"
-          {...brillo}
         >
           <header className="tarjeta__encabezado">
             <MarcaClack />
@@ -118,7 +118,7 @@ export default function PantallaLogin({ alEntrar }) {
               Cuenta demo
             </button>
           </footer>
-        </section>
+        </CajaVidrio>
       </main>
     </div>
   );

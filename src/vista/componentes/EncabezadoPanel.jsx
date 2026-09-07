@@ -3,11 +3,12 @@
  * -------------------
  * La barra de arriba del panel: la marca, el saludo y el botón de salir.
  */
+import CajaVidrio from "./CajaVidrio.jsx";
 import MarcaClack from "./MarcaClack.jsx";
 
 export default function EncabezadoPanel({ nombreDeUsuario, horaLocal, alCerrarSesion }) {
   return (
-    <header className="encabezado-panel vidrio">
+    <CajaVidrio className="encabezado-panel" como="header">
       <MarcaClack />
 
       <div className="encabezado-panel__usuario">
@@ -20,6 +21,6 @@ export default function EncabezadoPanel({ nombreDeUsuario, horaLocal, alCerrarSe
       <button className="boton-vidrio" type="button" onClick={alCerrarSesion}>
         Cerrar sesión
       </button>
-    </header>
+    </CajaVidrio>
   );
 }

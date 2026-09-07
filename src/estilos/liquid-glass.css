@@ -4,10 +4,13 @@
    Se pueden usar en cualquier pantalla de Clack.
    ===================================================================== */
 
-/* --- Superficie de vidrio ---------------------------------------------- */
-.vidrio {
-  position: relative;
-  isolation: isolate;
+/* --- Superficie de vidrio ----------------------------------------------
+   La caja la dibuja el componente CajaVidrio (BorderGlow). Aquí solo se
+   le cambia el fondo sólido que trae por defecto por nuestro vidrio
+   translúcido. Se usan dos clases en el selector para ganarle al estilo
+   original sin tener que tocar BorderGlow.css.
+   ----------------------------------------------------------------------- */
+.border-glow-card.caja-vidrio {
   background: linear-gradient(
     155deg,
     rgba(255, 255, 255, 0.68),
@@ -15,33 +18,25 @@
   );
   backdrop-filter: blur(var(--vidrio-desenfoque)) saturate(160%);
   -webkit-backdrop-filter: blur(var(--vidrio-desenfoque)) saturate(160%);
-  border: 1px solid var(--vidrio-borde);
-  border-radius: var(--radio-grande);
+  border-color: var(--vidrio-borde);
   box-shadow:
     var(--sombra-flotante),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(20, 184, 166, 0.08);
-  overflow: hidden;
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
-/* Brillo que sigue al cursor (lo mueve el hook useBrilloCursor). */
-.vidrio::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: radial-gradient(
-    45% 45% at var(--brillo-x, 50%) var(--brillo-y, 0%),
-    var(--vidrio-brillo),
-    transparent 70%
-  );
-  opacity: 0.5;
-  transition: opacity var(--transicion);
-  pointer-events: none;
+/* El contenido no debe recortarse ni sacar barras de desplazamiento. */
+.caja-vidrio > .border-glow-inner {
+  overflow: visible;
 }
 
-.vidrio:hover::before {
-  opacity: 0.75;
+/* El resplandor viene preparado para fondos oscuros: mezcla la luz con
+   el modo "plus-lighter", que sobre blanco no se ve (blanco + luz sigue
+   siendo blanco). El componente trae la corrección para fondos claros,
+   pero pierde por orden en el archivo. Se fuerza aquí, con un selector
+   más específico, sin tocar BorderGlow.css. */
+.border-glow-card.caja-vidrio > .edge-light,
+.border-glow-card.caja-vidrio::after {
+  mix-blend-mode: normal;
 }
 
 /* --- Campos de texto ---------------------------------------------------- */

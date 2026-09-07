@@ -4,6 +4,7 @@
  * La ficha de la ciudad que está en el centro del carrusel: su nombre,
  * la hora que es allá ahora mismo y la temperatura que hace.
  */
+import CajaVidrio from "./CajaVidrio.jsx";
 import IconoClima from "./IconoClima.jsx";
 
 export default function DetalleCiudad({
@@ -16,7 +17,7 @@ export default function DetalleCiudad({
   clima,
 }) {
   return (
-    <section className="detalle-ciudad vidrio" aria-live="polite">
+    <CajaVidrio className="detalle-ciudad" como="section" aria-live="polite">
       <div className="detalle-ciudad__lugar">
         <h2 className="detalle-ciudad__nombre">{nombre}</h2>
         <p className="detalle-ciudad__pais">{pais}</p>
@@ -34,7 +35,7 @@ export default function DetalleCiudad({
         <span className="etiqueta-dato">{diferenciaContigo}</span>
         <EtiquetaDelClima clima={clima} ciudad={nombre} />
       </div>
-    </section>
+    </CajaVidrio>
   );
 }
 

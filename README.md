@@ -98,6 +98,7 @@ Clack/
     │   │   ├── CampoTexto.jsx           Un campo del formulario
     │   │   ├── CampoContrasena.jsx      Campo con el ojo de "mostrar"
     │   │   ├── InterruptorRecordarme.jsx
+    │   │   ├── CajaVidrio.jsx           👈 La caja de vidrio con resplandor
     │   │   ├── EncabezadoPanel.jsx      Barra de arriba del panel
     │   │   ├── DetalleCiudad.jsx        Ficha de la ciudad enfocada
     │   │   └── IconoClima.jsx           Sol, nube, lluvia, nieve...
@@ -110,7 +111,8 @@ Clack/
     │   │   ├── WebThreads.jsx           Motor de React Bits ⚠️ no tocar
     │   │   └── WebThreads.css
     │   └── efectos/
-    │       └── useBrilloCursor.js       El brillo que sigue al cursor
+    │       ├── BorderGlow.jsx           Motor de React Bits ⚠️ no tocar
+    │       └── BorderGlow.css
     │
     └── estilos/                ← El aspecto visual
         ├── base.css                 Colores de la marca y tipografía
@@ -183,8 +185,13 @@ el motor `WebThreads.jsx` se deja tal cual para poder actualizarlo cuando
 salga una versión nueva.
 
 **Liquid Glass:** superficies translúcidas con desenfoque (`backdrop-filter`),
-bordes finos con luz interior, un brillo especular que sigue al cursor y
-sombras suaves en turquesa. Respeta `prefers-reduced-motion`.
+bordes finos y sombras suaves en turquesa. Respeta `prefers-reduced-motion`.
+
+**Resplandor en los bordes:** el componente
+[`BorderGlow`](https://reactbits.dev/components/border-glow) de React Bits.
+Al acercar el cursor al borde de cualquier caja, se enciende una luz turquesa
+que sigue tu dirección. Todas las cajas de la app usan el mismo componente,
+`CajaVidrio.jsx`: si hay que cambiar el efecto, se cambia ahí una sola vez.
 
 ---
 
@@ -240,6 +247,8 @@ Componentes de [React Bits](https://reactbits.dev):
   dibujado con WebGL gracias a [`ogl`](https://github.com/oframe/ogl).
 * [DepthCarousel](https://reactbits.dev/components/depth-carousel) — el carrusel
   de ciudades, animado con [`gsap`](https://gsap.com).
+* [BorderGlow](https://reactbits.dev/components/border-glow) — el resplandor de
+  los bordes (sin dependencias, CSS puro).
 
 Datos del clima: [Open-Meteo](https://open-meteo.com).
 Fotos de las ciudades: [Wikimedia Commons](https://commons.wikimedia.org).

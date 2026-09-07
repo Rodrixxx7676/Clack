@@ -46,11 +46,16 @@
 
 /* --- Tarjeta ------------------------------------------------------------ */
 .tarjeta {
+  transition: opacity var(--transicion), transform var(--transicion);
+}
+
+/* El contenido va dentro de la caja de vidrio, así que el espaciado
+   se le pone al cuerpo, no a la caja. */
+.tarjeta .caja-vidrio__cuerpo {
   padding: 32px;
   display: flex;
   flex-direction: column;
   gap: 22px;
-  transition: opacity var(--transicion), transform var(--transicion);
 }
 
 .tarjeta--ocupada {
@@ -158,36 +163,6 @@
   color: var(--texto-tenue);
 }
 
-/* --- Panel de bienvenida (después de entrar) --------------------------- */
-.bienvenida {
-  padding: 40px 32px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  animation: aparecer 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.bienvenida__icono {
-  width: 58px;
-  height: 58px;
-  margin: 0 auto;
-  color: var(--turquesa-medio);
-}
-
-.bienvenida h2 {
-  margin: 0;
-  font-size: 25px;
-  letter-spacing: -0.5px;
-}
-
-.bienvenida p {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--texto-suave);
-}
-
 /* --- Pantallas pequeñas ------------------------------------------------- */
 @media (max-width: 480px) {
   .pantalla-login {
@@ -196,9 +171,8 @@
     padding-top: 8vh;
   }
 
-  .tarjeta {
+  .tarjeta .caja-vidrio__cuerpo {
     padding: 24px 20px;
-    border-radius: var(--radio-medio);
   }
 
   .titulo {
