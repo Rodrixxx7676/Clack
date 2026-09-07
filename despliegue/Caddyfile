@@ -1,0 +1,31 @@
+# ---------------------------------------------------------------------
+# Caddyfile del servidor  —  COPIA DE REFERENCIA
+# ---------------------------------------------------------------------
+# El que manda de verdad vive en el servidor, en:
+#   /home/ubuntu/n8n-docker/Caddyfile
+#
+# Esta copia está aquí solo para que se vea, sin entrar al servidor,
+# cómo está repartido el tráfico. Si cambias uno, cambia el otro.
+#
+# Un bloque por aplicación. Para agregar la siguiente, se copia el de
+# Clack y se cambian el dominio y el nombre del contenedor.
+# ---------------------------------------------------------------------
+
+# n8n — igual que el comando de una línea que había antes: nada añadido.
+kursperu.duckdns.org {
+	reverse_proxy n8n:5678
+}
+
+# Clack
+clack.kursperu.duckdns.org {
+	encode zstd gzip
+	reverse_proxy clack:3001
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Frame-Options "SAMEORIGIN"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+}

@@ -9,6 +9,8 @@ hecha en **React**, con diseño *Liquid Glass* en **blanco y turquesa**.
 > **Estado actual: Paso 3 — Login + panel con el carrusel de ciudades,
 > su hora en vivo y su temperatura.**
 
+### 🌐 En vivo: **https://clack.kursperu.duckdns.org**
+
 ---
 
 ## ▶️ Cómo verla en tu computador
@@ -33,8 +35,13 @@ Abre la dirección que aparece en la terminal (normalmente <http://localhost:517
 
 También puedes pulsar el botón **“Cuenta demo”** y se rellena sola.
 
-Para generar la versión final (la que se sube a internet): `npm run build`.
-Para publicarla en el servidor, mira **[DESPLIEGUE.md](DESPLIEGUE.md)**.
+Para publicar los cambios en internet, un solo comando:
+
+```bash
+bash despliegue/publicar.sh
+```
+
+Los detalles del servidor están en **[DESPLIEGUE.md](DESPLIEGUE.md)**.
 
 ---
 
@@ -52,14 +59,13 @@ Clack/
 ├── servidor/
 │   └── servidor.js             ← Entrega la web en el puerto 3001
 ├── despliegue/
+│   ├── publicar.sh             ← 👈 Sube una versión nueva a internet
+│   ├── Dockerfile              ← La imagen de Clack para el servidor
+│   ├── package.produccion.json ← Solo Express, sin herramientas de desarrollo
+│   ├── Caddyfile               ← Copia de quién atiende cada dominio
 │   ├── revisar-servidor.sh     ← Radiografía del servidor (solo mira)
-│   ├── instalar-clack.sh       ← Instala y publica, deshaciendo si falla
-│   ├── Caddyfile.clack         ← Config del proxy inverso (HTTPS)
-│   ├── clack.service           ← Para que arranque solo al encender
 │   ├── duckdns-actualizar.sh   ← Mantiene el dominio apuntando bien
-│   ├── duckdns.service/.timer  ← Lo ejecuta cada 5 minutos
-│   ├── Dockerfile              ← Por si Caddy corre en Docker
-│   └── docker-compose.clack.yml
+│   └── duckdns.service/.timer  ← Lo ejecuta cada 5 minutos
 └── src/
     ├── main.jsx                ← Enciende React y carga los estilos
     ├── App.jsx                 ← La raíz: sin sesión muestra el Login,
