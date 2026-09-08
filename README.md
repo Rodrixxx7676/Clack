@@ -79,7 +79,8 @@ Clack/
     │   ├── Ciudad.js                Una ciudad y qué hora es allá
     │   ├── catalogoDeCiudades.js    👈 La lista de ciudades del panel
     │   ├── Clima.js                 Los grados y el estado del cielo
-    │   └── ServicioDelClima.js      Le pregunta la temperatura a internet
+    │   ├── ServicioDelClima.js      Le pregunta la temperatura a internet
+    │   └── ServicioRecaptcha.js     Comprueba que quien entra es persona
     │
     ├── vista-modelo/           ← 2. VIEWMODEL: el cerebro de cada pantalla
     │   ├── useSesion.js             Quién está conectado ahora
@@ -101,7 +102,8 @@ Clack/
     │   │   ├── CajaVidrio.jsx           👈 La caja de vidrio con resplandor
     │   │   ├── EncabezadoPanel.jsx      Barra de arriba del panel
     │   │   ├── DetalleCiudad.jsx        Ficha de la ciudad enfocada
-    │   │   └── IconoClima.jsx           Sol, nube, lluvia, nieve...
+    │   │   ├── IconoClima.jsx           Sol, nube, lluvia, nieve...
+    │   │   └── SeccionGlobo.jsx         El piso del video del globo
     │   ├── carruseles/
     │   │   ├── CarruselCiudades.jsx     Configura el carrusel
     │   │   ├── DepthCarousel.jsx        Motor de React Bits ⚠️ no tocar
@@ -168,6 +170,16 @@ new Ciudad({
 Todos los colores viven en variables CSS dentro de `src/estilos/base.css`:
 cambiando ahí, cambia toda la app.
 
+**El panel son "pisos":** secciones de alto completo que se recorren
+bajando. El primero es el carrusel de ciudades; el segundo, un video del
+globo terráqueo de fondo con el mensaje de la marca. Para añadir otro piso,
+se agrega una sección más en `PanelInicio.jsx`.
+
+**Seguridad del login:** [reCAPTCHA v3](https://www.google.com/recaptcha) de
+Google. Es invisible: puntúa el comportamiento del visitante del 0 al 1 y el
+**servidor** decide si pasa. La clave secreta vive solo dentro del servidor;
+si falta, el login avisa por consola y en `/salud` que está sin protección.
+
 **Temperatura:** se pide a [Open-Meteo](https://open-meteo.com), un servicio
 gratuito que no necesita clave. Las seis ciudades se consultan **en una sola
 llamada** y se refrescan cada 10 minutos. Los relojes se ven al instante y la
@@ -207,7 +219,7 @@ Lo que pide la planificación y en qué va cada cosa:
 | Ver la hora de varias ciudades a la vez (hasta 10) | 🟡 Se ven 6 ciudades fijas; falta que cada usuario elija las suyas |
 | Registrarse e iniciar sesión con correo y contraseña | 🟡 El login funciona (cuenta de prueba); falta el registro y un servidor real |
 | Inicio de sesión con Google o Microsoft (OAuth 2.0) | 🔴 Pendiente — necesita servidor |
-| Seguridad: reCAPTCHA en registro y login | 🔴 Pendiente — necesita servidor que valide el token |
+| Seguridad: reCAPTCHA en registro y login | 🟡 Hecho en el login, validado en el servidor; falta el registro |
 | Rendimiento: los relojes en menos de 2 segundos | 🟢 Los relojes salen al instante y la temperatura tarda ~0,3 s |
 | Interfaz 100% responsive (Android e iOS) | 🟢 Probado en móvil, tablet y escritorio |
 
@@ -229,8 +241,9 @@ Lo que pide la planificación y en qué va cada cosa:
 - [x] **Paso 1 —** Login en React, Liquid Glass blanco + turquesa, fondo WebThreads.
 - [x] **Paso 2 —** Panel de inicio con el carrusel de ciudades y su hora en vivo.
 - [x] **Paso 3 —** Temperatura actual de cada ciudad.
-- [ ] **Paso 4 —** Registro de usuarios y ciudades favoritas (hasta 10).
-- [ ] **Paso 5 —** Servidor real: cuentas, OAuth 2.0 (Google/Microsoft) y reCAPTCHA.
+- [x] **Paso 4 —** reCAPTCHA v3 en el login, verificado en el servidor.
+- [ ] **Paso 5 —** Registro de usuarios y ciudades favoritas (hasta 10).
+- [ ] **Paso 6 —** Servidor real: cuentas con contraseñas cifradas y OAuth 2.0.
 
 ---
 

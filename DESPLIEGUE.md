@@ -232,6 +232,70 @@ echo "n8n:   $(curl -s -o /dev/null -w '%{http_code}' https://kursperu.duckdns.o
 
 ---
 
+## 🔐 Configurar reCAPTCHA en el servidor
+
+El login ya está preparado, pero **la protección solo se activa cuando el
+servidor tiene la clave secreta**. Mientras no la tenga, deja pasar a todos
+y lo avisa por consola y en `/salud`.
+
+Comprobar en qué estado está:
+
+```bash
+curl -s https://clack.kursperu.duckdns.org/salud
+```
+
+Si dice `"recaptcha":"desactivado"`, falta configurarlo. Se hace así:
+
+```bash
+ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo mkdir -p /etc/clack && sudo nano /etc/clack/recaptcha.env'
+```
+
+Dentro, una sola línea con **tu** clave secreta (la que Google llama
+"clave secreta", no la de sitio):
+
+```
+RECAPTCHA_SECRET=aqui-va-tu-clave-secreta
+```
+
+Se puede añadir el umbral, si quieres ser más o menos estricto. Por
+defecto es 0.5, donde 1 es "seguro que es una persona" y 0 "seguro que es
+un robot":
+
+```
+RECAPTCHA_MINIMO=0.5
+```
+
+Y luego, permisos y aplicar:
+
+```bash
+ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo chmod 600 /etc/clack/recaptcha.env && docker restart clack && sleep 3 && curl -s http://127.0.0.1:3001/salud'
+```
+
+Debe responder `"recaptcha":"activo"`.
+
+> ⚠️ **La clave secreta no se sube nunca a GitHub.** Vive solo en ese
+> archivo del servidor, con permisos `600` (solo la puede leer root).
+> `publicar.sh` se encarga de pasársela al contenedor en cada despliegue.
+
+### Cómo funciona la protección
+
+```
+Navegador                    Servidor (3001)              Google
+    │                              │                        │
+    │ 1. pide ficha ───────────────┼───────────────────────▶ │
+    │ ◀──────────────── ficha ─────┼─────────────────────────│
+    │ 2. envía ficha ─────────────▶│                        │
+    │                              │ 3. ¿es válida? ───────▶ │
+    │                              │ ◀──── puntuación 0..1 ──│
+    │ ◀──── aprobado sí/no ────────│                        │
+```
+
+El paso 3 es el que importa: **la clave secreta y la decisión están en el
+servidor**. Si la comprobación se hiciera en el navegador, un robot
+simplemente no ejecutaría ese código y entraría igual.
+
+---
+
 ## ⚠️ Antes de meter datos reales
 
 Clack ya está en internet, pero **todavía no guarda información de nadie**:

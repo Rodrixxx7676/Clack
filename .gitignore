@@ -24,3 +24,6 @@ dist/
 # Claves y secretos: nunca al repositorio
 .env
 *.env
+
+# El video original sin comprimir se queda fuera del repositorio
+flow/

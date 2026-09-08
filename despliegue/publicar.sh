@@ -41,9 +41,21 @@ ssh -i "$LLAVE" "$SERVIDOR" '
   find . -name "._*" -delete          # basura que añade macOS
   docker build -q -f despliegue/Dockerfile -t clack:latest .
   docker rm -f clack >/dev/null 2>&1 || true
+
+  # Las claves secretas (reCAPTCHA y las que vengan) viven solo en el
+  # servidor, en /etc/clack/recaptcha.env, y se le pasan al contenedor.
+  SECRETOS=""
+  if [ -f /etc/clack/recaptcha.env ]; then
+    SECRETOS="--env-file /etc/clack/recaptcha.env"
+    echo "   claves de reCAPTCHA encontradas ✓"
+  else
+    echo "   ⚠️  sin /etc/clack/recaptcha.env: el login quedará sin reCAPTCHA"
+  fi
+
   docker run -d --name clack --restart unless-stopped \
     --network n8n-docker_default --memory 256m \
     --log-opt max-size=10m --log-opt max-file=3 \
+    $SECRETOS \
     clack:latest >/dev/null
   docker image prune -f >/dev/null    # borra la imagen vieja: el disco va justo
   sleep 5

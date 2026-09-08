@@ -33,8 +33,26 @@ const DIRECCION = process.env.HOST || "127.0.0.1";
 
 const app = express();
 
+// Para poder leer el cuerpo JSON de las peticiones.
+app.use(express.json({ limit: "10kb" }));
+
 // Caddy va delante: así el servidor sabe la IP real de quien visita.
 app.set("trust proxy", 1);
+
+// --- reCAPTCHA -------------------------------------------------------
+// La clave secreta NUNCA se escribe aquí. Se lee de una variable de
+// entorno que vive solo dentro del servidor, en /etc/clack/recaptcha.env
+const CLAVE_SECRETA_RECAPTCHA = process.env.RECAPTCHA_SECRET || "";
+const PUNTUACION_MINIMA = Number(process.env.RECAPTCHA_MINIMO) || 0.5;
+const RECAPTCHA_ACTIVO = CLAVE_SECRETA_RECAPTCHA.length > 0;
+
+if (!RECAPTCHA_ACTIVO) {
+  console.warn(
+    "⚠️  reCAPTCHA DESACTIVADO: falta RECAPTCHA_SECRET.\n" +
+      "   El login queda sin protección contra robots. En desarrollo es\n" +
+      "   normal; en el servidor de verdad hay que configurarlo."
+  );
+}
 
 // Para saber de un vistazo si el servidor está vivo:
 // https://clack.kursperu.duckdns.org/salud
@@ -42,8 +60,85 @@ app.get("/salud", (peticion, respuesta) => {
   respuesta.json({
     estado: "ok",
     aplicacion: "Clack",
+    recaptcha: RECAPTCHA_ACTIVO ? "activo" : "desactivado",
     momento: new Date().toISOString(),
   });
+});
+
+/**
+ * Recibe la ficha del navegador y le pregunta a Google si viene de una
+ * persona. Responde con la puntuación (0 = robot, 1 = persona).
+ */
+app.post("/api/verificar-recaptcha", async (peticion, respuesta) => {
+  const { ficha, accion } = peticion.body ?? {};
+
+  // Sin clave configurada no se puede verificar nada: se deja pasar, pero
+  // queda dicho en la respuesta para que no pase desapercibido.
+  if (!RECAPTCHA_ACTIVO) {
+    return respuesta.json({
+      aprobado: true,
+      puntuacion: null,
+      motivo: "reCAPTCHA no está configurado en este servidor",
+    });
+  }
+
+  if (typeof ficha !== "string" || ficha.length === 0) {
+    return respuesta.status(400).json({
+      aprobado: false,
+      puntuacion: null,
+      motivo: "Falta la ficha de reCAPTCHA",
+    });
+  }
+
+  try {
+    const consulta = new URLSearchParams({
+      secret: CLAVE_SECRETA_RECAPTCHA,
+      response: ficha,
+      remoteip: peticion.ip,
+    });
+
+    const respuestaDeGoogle = await fetch(
+      "https://www.google.com/recaptcha/api/siteverify",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: consulta,
+      }
+    );
+
+    const datos = await respuestaDeGoogle.json();
+
+    if (!datos.success) {
+      return respuesta.json({
+        aprobado: false,
+        puntuacion: null,
+        motivo: "Google rechazó la ficha",
+      });
+    }
+
+    // La acción debe coincidir: evita reutilizar una ficha de otra pantalla.
+    if (accion && datos.action && datos.action !== accion) {
+      return respuesta.json({
+        aprobado: false,
+        puntuacion: datos.score ?? null,
+        motivo: "La ficha no corresponde a esta acción",
+      });
+    }
+
+    const puntuacion = datos.score ?? 0;
+    return respuesta.json({
+      aprobado: puntuacion >= PUNTUACION_MINIMA,
+      puntuacion,
+      motivo: puntuacion >= PUNTUACION_MINIMA ? "ok" : "Puntuación demasiado baja",
+    });
+  } catch (error) {
+    console.error("Error consultando a reCAPTCHA:", error.message);
+    return respuesta.status(502).json({
+      aprobado: false,
+      puntuacion: null,
+      motivo: "No pudimos contactar con reCAPTCHA",
+    });
+  }
 });
 
 // Los archivos de la web (HTML, CSS, JavaScript, imágenes).

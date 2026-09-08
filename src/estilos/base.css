@@ -46,10 +46,15 @@
   display: none !important;
 }
 
-html,
-body,
-#raiz {
-  height: 100%;
+html {
+  /* Al pulsar la flecha, se baja al siguiente piso con suavidad. */
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {

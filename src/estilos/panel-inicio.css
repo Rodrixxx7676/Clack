@@ -4,17 +4,18 @@
    Aquí también se viste el carrusel de React Bits con los colores de Clack.
    ===================================================================== */
 
+/* El panel son "pisos": secciones de alto completo que se recorren
+   bajando. Para agregar otro, basta con otra sección de 100dvh. */
 .panel-inicio {
   position: relative;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
 }
 
 .panel-inicio__contenido {
   position: relative;
   z-index: 1;
-  flex: 1;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
   width: min(1080px, 100%);
   margin: 0 auto;
   padding: 18px 20px 22px;
@@ -252,6 +253,113 @@
   }
 }
 
+/* --- Flecha para bajar al siguiente piso -------------------------------- */
+.panel-inicio__bajar {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-top: 2px;
+  color: var(--turquesa-medio);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform var(--transicion), background var(--transicion);
+  animation: rebotar 2.4s ease-in-out infinite;
+}
+
+.panel-inicio__bajar svg {
+  width: 20px;
+  height: 20px;
+}
+
+.panel-inicio__bajar:hover {
+  background: #ffffff;
+  transform: translateY(2px);
+}
+
+@keyframes rebotar {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+/* =======================================================================
+   PISO 2 — El globo terráqueo en video
+   ======================================================================= */
+.seccion-globo {
+  position: relative;
+  z-index: 1; /* por encima del fondo de hilos, que es fijo */
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 48px 24px;
+  overflow: hidden;
+  background: #04211f; /* por si el video tarda o no carga */
+}
+
+.seccion-globo__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Un velo oscuro para que el texto se lea siempre. */
+.seccion-globo__velo {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+      to bottom,
+      rgba(4, 33, 31, 0.82) 0%,
+      rgba(4, 33, 31, 0.55) 45%,
+      rgba(4, 33, 31, 0.88) 100%
+    ),
+    radial-gradient(70% 60% at 50% 50%, transparent 0%, rgba(4, 33, 31, 0.5) 100%);
+}
+
+.seccion-globo__contenido {
+  position: relative;
+  width: min(720px, 100%);
+  text-align: center;
+  color: #ffffff;
+}
+
+.seccion-globo__antetitulo {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--turquesa-brillo);
+}
+
+.seccion-globo__titulo {
+  margin: 0;
+  font-size: clamp(28px, 4.6vw, 46px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -1px;
+  text-wrap: balance;
+}
+
+.seccion-globo__texto {
+  margin: 20px auto 0;
+  max-width: 560px;
+  font-size: clamp(14px, 1.6vw, 16.5px);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.82);
+  text-wrap: pretty;
+}
+
 /* --- Pantallas de poca altura -------------------------------------------
    En monitores bajos (portátiles de 720px) todo junto no cabía y aparecía
    una barra de desplazamiento. Aquí se aprieta un poco para que entre.
@@ -282,6 +390,11 @@
 
   .detalle-ciudad__descripcion {
     font-size: 13px;
+  }
+
+  .panel-inicio__bajar {
+    width: 34px;
+    height: 34px;
   }
 }
 

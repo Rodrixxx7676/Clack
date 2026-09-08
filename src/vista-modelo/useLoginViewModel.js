@@ -12,9 +12,13 @@
  */
 import { useCallback, useState } from "react";
 import { ServicioAutenticacion } from "../modelo/ServicioAutenticacion.js";
+import { ServicioRecaptcha } from "../modelo/ServicioRecaptcha.js";
 import { revisarCorreo, revisarContrasena } from "../modelo/ValidadorCredenciales.js";
 
-export function useLoginViewModel({ entrar }) {
+// Una sola instancia para toda la pantalla.
+const recaptchaPorDefecto = new ServicioRecaptcha();
+
+export function useLoginViewModel({ entrar, recaptcha = recaptchaPorDefecto }) {
   // Lo que el usuario escribe.
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
@@ -68,13 +72,23 @@ export function useLoginViewModel({ entrar }) {
     setCargando(true);
     setErrorGeneral(null);
     try {
+      // Primero: comprobar que quien entra es una persona.
+      const comprobacion = await recaptcha.comprobar("iniciar_sesion");
+      if (!comprobacion.aprobado) {
+        setErrorGeneral(
+          "No pudimos confirmar que eres una persona. Recarga la página e inténtalo otra vez."
+        );
+        setCargando(false);
+        return;
+      }
+
       await entrar({ correo, contrasena, recordarme });
       // Si todo salió bien, App.jsx cambia solo a la pantalla del panel.
     } catch (error) {
       setErrorGeneral(error.message);
       setCargando(false);
     }
-  }, [cargando, contrasena, correo, entrar, recordarme]);
+  }, [cargando, contrasena, correo, entrar, recaptcha, recordarme]);
 
   const mostrarAyudaContrasena = useCallback((correoSoporte) => {
     setErrorGeneral(`Escríbenos a ${correoSoporte} y te ayudamos a recuperarla.`);
