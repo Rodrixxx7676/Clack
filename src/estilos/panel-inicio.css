@@ -67,6 +67,237 @@
   color: var(--texto-tenue);
 }
 
+.encabezado-panel__acciones {
+  display: flex;
+  gap: 8px;
+}
+
+.panel-inicio__cargando {
+  margin: auto;
+  color: var(--texto-suave);
+  font-size: 15px;
+}
+
+/* =======================================================================
+   Ventana "Mis ciudades"
+   ======================================================================= */
+.gestor {
+  width: min(520px, calc(100vw - 32px));
+  max-height: min(80vh, 720px);
+  padding: 0;
+  border: 1px solid var(--vidrio-borde);
+  border-radius: var(--radio-grande);
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  box-shadow: var(--sombra-flotante);
+  color: var(--texto-principal);
+  overflow: hidden;
+}
+
+.gestor::backdrop {
+  background: rgba(7, 43, 41, 0.35);
+  backdrop-filter: blur(3px);
+}
+
+.gestor__cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  max-height: min(80vh, 720px);
+  overflow-y: auto;
+}
+
+.gestor__encabezado {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.gestor__titulo {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+}
+
+.gestor__contador {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--texto-tenue);
+}
+
+.gestor__cerrar {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: var(--texto-suave);
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.gestor__cerrar:hover {
+  background: rgba(15, 118, 110, 0.12);
+  color: var(--turquesa-medio);
+}
+
+.gestor__aviso {
+  margin: 0;
+  font-size: 13px;
+  color: var(--texto-tenue);
+}
+
+/* --- Resultados de la búsqueda --- */
+.gestor__resultados {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.gestor__resultado {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 10px 14px;
+  font-family: inherit;
+  text-align: left;
+  color: var(--texto-principal);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(15, 118, 110, 0.16);
+  border-radius: var(--radio-pequeno);
+  cursor: pointer;
+  transition: background var(--transicion), border-color var(--transicion);
+}
+
+.gestor__resultado:hover:not(:disabled) {
+  background: #ffffff;
+  border-color: var(--turquesa);
+}
+
+.gestor__resultado:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.gestor__resultado-nombre {
+  font-weight: 650;
+  font-size: 14.5px;
+}
+
+.gestor__resultado-lugar {
+  grid-column: 1;
+  font-size: 12px;
+  color: var(--texto-tenue);
+}
+
+.gestor__resultado-mas {
+  grid-row: 1 / 3;
+  grid-column: 2;
+  font-size: 22px;
+  color: var(--turquesa-medio);
+}
+
+/* --- La lista de ciudades elegidas --- */
+.gestor__lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gestor__ciudad {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(15, 118, 110, 0.14);
+  border-radius: var(--radio-pequeno);
+}
+
+.gestor__orden {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--turquesa-medio);
+  background: rgba(20, 184, 166, 0.14);
+  border-radius: 50%;
+}
+
+.gestor__datos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.gestor__datos strong {
+  font-size: 14.5px;
+}
+
+.gestor__datos small {
+  font-size: 12px;
+  color: var(--texto-tenue);
+}
+
+.gestor__acciones {
+  display: flex;
+  gap: 4px;
+}
+
+.gestor__acciones button {
+  width: 30px;
+  height: 30px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--turquesa-medio);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background var(--transicion);
+}
+
+.gestor__acciones button:hover:not(:disabled) {
+  background: #ffffff;
+  border-color: var(--turquesa);
+}
+
+.gestor__acciones button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.gestor__quitar {
+  color: #b3261e !important;
+  border-color: rgba(179, 38, 30, 0.25) !important;
+}
+
+@media (max-width: 620px) {
+  .encabezado-panel__acciones {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 /* --- Carrusel de ciudades ---------------------------------------------- */
 .carrusel-ciudades {
   width: 100%;

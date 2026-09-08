@@ -6,7 +6,12 @@
 import CajaVidrio from "./CajaVidrio.jsx";
 import MarcaClack from "./MarcaClack.jsx";
 
-export default function EncabezadoPanel({ nombreDeUsuario, horaLocal, alCerrarSesion }) {
+export default function EncabezadoPanel({
+  nombreDeUsuario,
+  horaLocal,
+  alCerrarSesion,
+  alAbrirCiudades,
+}) {
   return (
     <CajaVidrio className="encabezado-panel" como="header">
       <MarcaClack />
@@ -18,9 +23,14 @@ export default function EncabezadoPanel({ nombreDeUsuario, horaLocal, alCerrarSe
         <p className="encabezado-panel__hora">Son las {horaLocal} donde estás</p>
       </div>
 
-      <button className="boton-vidrio" type="button" onClick={alCerrarSesion}>
-        Cerrar sesión
-      </button>
+      <div className="encabezado-panel__acciones">
+        <button className="boton-vidrio" type="button" onClick={alAbrirCiudades}>
+          Mis ciudades
+        </button>
+        <button className="boton-vidrio" type="button" onClick={alCerrarSesion}>
+          Cerrar sesión
+        </button>
+      </div>
     </CajaVidrio>
   );
 }

@@ -17,6 +17,15 @@ import { ServicioRecaptcha } from "./ServicioRecaptcha.js";
 
 const LLAVE_SESION = "clack.sesion";
 
+// La llave de sesión que entrega el servidor. Se guarda junto al usuario
+// y se envía en cada petición que necesite saber quién eres.
+let llaveDeSesionEnMemoria = null;
+
+/** La llave de la sesión actual, para las peticiones al servidor. */
+export function llaveDeSesion() {
+  return llaveDeSesionEnMemoria;
+}
+
 /** Lee la respuesta del servidor y lanza un error legible si algo falló. */
 async function leerRespuesta(respuesta) {
   let datos = {};
@@ -50,9 +59,9 @@ export class ServicioAutenticacion {
       body: JSON.stringify({ ...datos, fichaRecaptcha }),
     });
 
-    const { usuario } = await leerRespuesta(respuesta);
+    const { usuario, llaveDeSesion: llave } = await leerRespuesta(respuesta);
     const nuevoUsuario = new Usuario(usuario);
-    this.#guardarSesion(nuevoUsuario, datos.recordarme ?? true);
+    this.#guardarSesion(nuevoUsuario, llave, datos.recordarme ?? true);
     return nuevoUsuario;
   }
 
@@ -66,9 +75,9 @@ export class ServicioAutenticacion {
       body: JSON.stringify({ correo, contrasena, fichaRecaptcha }),
     });
 
-    const { usuario } = await leerRespuesta(respuesta);
+    const { usuario, llaveDeSesion: llave } = await leerRespuesta(respuesta);
     const usuarioConectado = new Usuario(usuario);
-    this.#guardarSesion(usuarioConectado, recordarme);
+    this.#guardarSesion(usuarioConectado, llave, recordarme);
     return usuarioConectado;
   }
 
@@ -77,7 +86,10 @@ export class ServicioAutenticacion {
     for (const almacen of [window.localStorage, window.sessionStorage]) {
       try {
         const guardado = almacen.getItem(LLAVE_SESION);
-        if (guardado) return new Usuario(JSON.parse(guardado));
+        if (!guardado) continue;
+        const { usuario, llave } = JSON.parse(guardado);
+        llaveDeSesionEnMemoria = llave ?? null;
+        return new Usuario(usuario);
       } catch {
         // Si el navegador bloquea el almacenamiento, seguimos sin sesión.
       }
@@ -86,6 +98,16 @@ export class ServicioAutenticacion {
   }
 
   cerrarSesion() {
+    // Se le avisa al servidor para que olvide la llave. Si falla, da
+    // igual: la llave caduca sola y aquí se borra de todas formas.
+    if (llaveDeSesionEnMemoria) {
+      fetch("/api/cerrar-sesion", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${llaveDeSesionEnMemoria}` },
+      }).catch(() => {});
+    }
+    llaveDeSesionEnMemoria = null;
+
     for (const almacen of [window.localStorage, window.sessionStorage]) {
       try {
         almacen.removeItem(LLAVE_SESION);
@@ -100,11 +122,12 @@ export class ServicioAutenticacion {
     return { correo: "demo@clack.app", contrasena: "clack1234" };
   }
 
-  #guardarSesion(usuario, recordarme) {
+  #guardarSesion(usuario, llave, recordarme) {
+    llaveDeSesionEnMemoria = llave ?? null;
     // "Recordarme" = queda guardada aunque cierres el navegador.
     const almacen = recordarme ? window.localStorage : window.sessionStorage;
     try {
-      almacen.setItem(LLAVE_SESION, JSON.stringify({ ...usuario }));
+      almacen.setItem(LLAVE_SESION, JSON.stringify({ usuario: { ...usuario }, llave }));
     } catch {
       // Modo privado: la sesión solo dura mientras la página esté abierta.
     }

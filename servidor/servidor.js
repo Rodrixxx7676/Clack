@@ -18,6 +18,7 @@ import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { rutasDeUsuarios } from "./usuarios/rutasDeUsuarios.js";
+import { rutasDeFavoritos } from "./favoritos/rutasDeFavoritos.js";
 import { almacenDeUsuarios } from "./usuarios/almacenDeUsuarios.js";
 import { RECAPTCHA_ACTIVO, verificarFicha } from "./seguridad/recaptcha.js";
 
@@ -56,6 +57,9 @@ app.get("/salud", async (peticion, respuesta) => {
 
 // Registro e inicio de sesión.
 app.use("/api", rutasDeUsuarios);
+
+// Las ciudades favoritas de cada persona (necesitan sesión).
+app.use("/api/favoritos", rutasDeFavoritos);
 
 // Comprobación suelta de reCAPTCHA, por si hace falta en otra pantalla.
 app.post("/api/verificar-recaptcha", async (peticion, respuesta) => {

@@ -5,6 +5,7 @@
  *
  *   POST /api/registro        crear una cuenta
  *   POST /api/inicio-sesion   entrar con una cuenta existente
+ *   POST /api/cerrar-sesion   olvidar la llave de sesión
  *
  * Las dos pasan primero por reCAPTCHA y luego revisan los datos con las
  * MISMAS reglas que usa la web. Nunca se confía en lo que llega del
@@ -13,6 +14,7 @@
 import express from "express";
 import { verificarFicha } from "../seguridad/recaptcha.js";
 import { almacenDeUsuarios } from "./almacenDeUsuarios.js";
+import { sesiones } from "./sesiones.js";
 import { revisarRegistro, revisarCorreo, revisarContrasena } from "../../comun/reglasDeUsuario.js";
 
 export const rutasDeUsuarios = express.Router();
@@ -56,7 +58,8 @@ rutasDeUsuarios.post("/registro", async (peticion, respuesta) => {
       fechaDeNacimiento: datos.fechaDeNacimiento,
       paisDeOrigen: datos.paisDeOrigen,
     });
-    return respuesta.status(201).json({ usuario });
+    const llaveDeSesion = await sesiones.crear(usuario.id);
+    return respuesta.status(201).json({ usuario, llaveDeSesion });
   } catch (error) {
     // Correo repetido: se avisa en el campo, no como error general.
     if (error.message.includes("Ya existe")) {
@@ -86,9 +89,18 @@ rutasDeUsuarios.post("/inicio-sesion", async (peticion, respuesta) => {
     if (!usuario) {
       return respuesta.status(401).json({ error: "Correo o contraseña incorrectos." });
     }
-    return respuesta.json({ usuario });
+    const llaveDeSesion = await sesiones.crear(usuario.id);
+    return respuesta.json({ usuario, llaveDeSesion });
   } catch (error) {
     console.error("Error iniciando sesión:", error);
     return respuesta.status(500).json({ error: "No pudimos entrar. Inténtalo más tarde." });
   }
+});
+
+// --- Salir ------------------------------------------------------------
+rutasDeUsuarios.post("/cerrar-sesion", async (peticion, respuesta) => {
+  const cabecera = peticion.headers.authorization ?? "";
+  const llave = cabecera.startsWith("Bearer ") ? cabecera.slice(7) : "";
+  await sesiones.cerrar(llave);
+  respuesta.json({ hecho: true });
 });

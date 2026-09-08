@@ -17,8 +17,9 @@ export function usePanelInicioViewModel(ciudades = CIUDADES) {
   const clima = useClimaDeCiudades(ciudades);
   const [indiceActivo, setIndiceActivo] = useState(0);
 
-  const ciudadActiva = ciudades[indiceActivo] ?? ciudades[0];
-  const climaActual = clima.climaDe(ciudadActiva.id);
+  // Mientras cargan las favoritas la lista puede venir vacía.
+  const ciudadActiva = ciudades[indiceActivo] ?? ciudades[0] ?? null;
+  const climaActual = ciudadActiva ? clima.climaDe(ciudadActiva.id) : null;
 
   /** El carrusel avisa aquí cada vez que cambia la tarjeta del centro. */
   const enfocarCiudad = useCallback((indice) => setIndiceActivo(indice), []);
@@ -28,8 +29,10 @@ export function usePanelInicioViewModel(ciudades = CIUDADES) {
     indiceActivo,
     enfocarCiudad,
 
+    hayCiudades: Boolean(ciudadActiva),
+
     // Datos ya listos para mostrar de la ciudad enfocada.
-    ciudadActiva: {
+    ciudadActiva: ciudadActiva && {
       nombre: ciudadActiva.nombre,
       pais: ciudadActiva.pais,
       descripcion: ciudadActiva.descripcion,

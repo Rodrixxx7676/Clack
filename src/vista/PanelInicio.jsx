@@ -11,17 +11,22 @@
  * Regla de oro de MVVM: aquí NO se decide nada.
  * Los datos vienen de usePanelInicioViewModel y aquí solo se pintan.
  */
+import { useState } from "react";
 import { usePanelInicioViewModel } from "../vista-modelo/usePanelInicioViewModel.js";
+import { useCiudadesFavoritas } from "../vista-modelo/useCiudadesFavoritas.js";
 import { useRelojLocal } from "../vista-modelo/useRelojLocal.js";
 import FondoWebThreads from "./fondos/FondoWebThreads.jsx";
 import CarruselCiudades from "./carruseles/CarruselCiudades.jsx";
 import EncabezadoPanel from "./componentes/EncabezadoPanel.jsx";
 import DetalleCiudad from "./componentes/DetalleCiudad.jsx";
 import SeccionGlobo from "./componentes/SeccionGlobo.jsx";
+import GestorDeCiudades from "./componentes/GestorDeCiudades.jsx";
 
 export default function PanelInicio({ usuario, alCerrarSesion }) {
-  const vm = usePanelInicioViewModel();
+  const favoritos = useCiudadesFavoritas();
+  const vm = usePanelInicioViewModel(favoritos.ciudades);
   const relojLocal = useRelojLocal();
+  const [gestorAbierto, setGestorAbierto] = useState(false);
 
   return (
     <div className="panel-inicio">
@@ -32,6 +37,7 @@ export default function PanelInicio({ usuario, alCerrarSesion }) {
           nombreDeUsuario={usuario.nombre}
           horaLocal={relojLocal.hora}
           alCerrarSesion={alCerrarSesion}
+          alAbrirCiudades={() => setGestorAbierto(true)}
         />
 
         <main className="panel-inicio__centro" id="ciudades">
@@ -39,9 +45,16 @@ export default function PanelInicio({ usuario, alCerrarSesion }) {
             Desliza para viajar entre ciudades y mira qué hora es allá ahora mismo.
           </p>
 
-          <CarruselCiudades ciudades={vm.ciudades} alEnfocarCiudad={vm.enfocarCiudad} />
-
-          <DetalleCiudad {...vm.ciudadActiva} />
+          {vm.hayCiudades ? (
+            <>
+              <CarruselCiudades ciudades={vm.ciudades} alEnfocarCiudad={vm.enfocarCiudad} />
+              <DetalleCiudad {...vm.ciudadActiva} />
+            </>
+          ) : (
+            <p className="panel-inicio__cargando">
+              {favoritos.cargando ? "Cargando tus ciudades…" : "Añade tu primera ciudad."}
+            </p>
+          )}
 
           <a className="panel-inicio__bajar" href="#globo" aria-label="Ver la siguiente sección">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -60,6 +73,12 @@ export default function PanelInicio({ usuario, alCerrarSesion }) {
       <div id="globo">
         <SeccionGlobo totalDeCiudades={vm.ciudades.length} />
       </div>
+
+      <GestorDeCiudades
+        abierto={gestorAbierto}
+        alCerrar={() => setGestorAbierto(false)}
+        favoritos={favoritos}
+      />
     </div>
   );
 }

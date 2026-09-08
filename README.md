@@ -61,9 +61,13 @@ Clack/
 ├── servidor/
 │   ├── servidor.js             ← Entrega la web en el puerto 3001
 │   ├── seguridad/recaptcha.js  ← Comprueba las fichas con Google
-│   └── usuarios/
-│       ├── almacenDeUsuarios.js   Guarda las cuentas (contraseñas cifradas)
-│       └── rutasDeUsuarios.js     /api/registro y /api/inicio-sesion
+│   ├── usuarios/
+│   │   ├── almacenDeUsuarios.js   Guarda las cuentas (contraseñas cifradas)
+│   │   ├── sesiones.js            Quién es quién en cada petición
+│   │   └── rutasDeUsuarios.js     /api/registro y /api/inicio-sesion
+│   └── favoritos/
+│       ├── almacenDeFavoritos.js  Las ciudades de cada persona
+│       └── rutasDeFavoritos.js    /api/favoritos
 ├── despliegue/
 │   ├── publicar.sh             ← 👈 Sube una versión nueva a internet
 │   ├── Dockerfile              ← La imagen de Clack para el servidor
@@ -86,7 +90,9 @@ Clack/
     │   ├── catalogoDeCiudades.js    👈 La lista de ciudades del panel
     │   ├── Clima.js                 Los grados y el estado del cielo
     │   ├── ServicioDelClima.js      Le pregunta la temperatura a internet
-    │   └── ServicioRecaptcha.js     Comprueba que quien entra es persona
+    │   ├── ServicioRecaptcha.js     Comprueba que quien entra es persona
+    │   ├── ServicioDeFavoritos.js   Las ciudades elegidas por cada persona
+    │   └── ServicioDeBusquedaDeCiudades.js  Busca ciudades del mundo
     │
     ├── vista-modelo/           ← 2. VIEWMODEL: el cerebro de cada pantalla
     │   ├── useSesion.js             Quién está conectado ahora
@@ -181,6 +187,14 @@ bajando. El primero es el carrusel de ciudades; el segundo, un video del
 globo terráqueo de fondo con el mensaje de la marca. Para añadir otro piso,
 se agrega una sección más en `PanelInicio.jsx`.
 
+**Instalable como app (PWA):** Clack se puede instalar en el móvil desde el
+navegador y queda con su icono, como cualquier otra aplicación. Abre rápido
+la segunda vez y muestra algo aunque no haya internet.
+
+**Tus ciudades:** cada persona elige hasta 10, buscándolas entre todas las
+del mundo con el buscador de [Open-Meteo](https://open-meteo.com). Se guardan
+en el servidor, así que aparecen igual desde el móvil o el computador.
+
 **Cuentas de usuario:** el registro y el login ocurren en el servidor. Las
 contraseñas se guardan cifradas con **bcrypt**, que es de un solo sentido:
 ni nosotros podemos leerlas. Las reglas de validación viven en
@@ -228,12 +242,12 @@ Lo que pide la planificación y en qué va cada cosa:
 
 | Requisito | Estado |
 | --------- | ------ |
-| Ver la hora de varias ciudades a la vez (hasta 10) | 🟡 Se ven 6 ciudades fijas; falta que cada usuario elija las suyas |
+| Ver la hora de varias ciudades a la vez (hasta 10) | 🟢 Cada persona elige las suyas, buscando entre todas las del mundo |
 | Registrarse e iniciar sesión con correo y contraseña | 🟢 Registro y login contra el servidor, con contraseñas cifradas (bcrypt) |
 | Inicio de sesión con Google o Microsoft (OAuth 2.0) | 🔴 Pendiente — necesita servidor |
 | Seguridad: reCAPTCHA en registro y login | 🟢 En los dos formularios, verificado en el servidor |
 | Rendimiento: los relojes en menos de 2 segundos | 🟢 Los relojes salen al instante y la temperatura tarda ~0,3 s |
-| Interfaz 100% responsive (Android e iOS) | 🟢 Probado en móvil, tablet y escritorio |
+| Interfaz 100% responsive (Android e iOS) | 🟢 Probado en móvil, tablet y escritorio, e instalable como app (PWA) |
 
 > ⚠️ OAuth 2.0 y reCAPTCHA **no pueden hacerse solo con React**: las claves
 > secretas tienen que vivir en un servidor. Son el siguiente gran paso.
@@ -244,7 +258,7 @@ Lo que pide la planificación y en qué va cada cosa:
 | ------- | ---------- |
 | `CIUDAD` | `src/modelo/Ciudad.js` (`ID_ZONA` → `id`, `NOMBRE_CIUDAD` → `nombre`, `CODIGO_ZONA` → `zonaHoraria`) |
 | `USUARIO` | `src/modelo/Usuario.js` (web) y `servidor/usuarios/almacenDeUsuarios.js` (datos). Los ocho atributos, con la contraseña cifrada |
-| `FAVORITO` | Todavía no existe: hoy la lista de ciudades es fija para todos |
+| `FAVORITO` | `servidor/favoritos/almacenDeFavoritos.js` — hasta 10 ciudades por persona, con su orden |
 
 ---
 
@@ -255,8 +269,10 @@ Lo que pide la planificación y en qué va cada cosa:
 - [x] **Paso 3 —** Temperatura actual de cada ciudad.
 - [x] **Paso 4 —** reCAPTCHA v3 en el login, verificado en el servidor.
 - [x] **Paso 5 —** Registro de usuarios con la entidad USUARIO completa.
-- [ ] **Paso 6 —** Ciudades favoritas: buscar, elegir y ordenar (hasta 10).
-- [ ] **Paso 7 —** OAuth 2.0 (Google/Microsoft) y sesiones con token.
+- [x] **Paso 6 —** Ciudades favoritas: buscar, elegir y ordenar (hasta 10).
+- [x] **Paso 7 —** Instalable como aplicación (PWA).
+- [ ] **Paso 8 —** Vista de reuniones, línea de día y noche, alarmas y enlaces para compartir.
+- [ ] **Paso 9 —** OAuth 2.0 (Google/Microsoft).
 
 ---
 

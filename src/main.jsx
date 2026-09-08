@@ -21,3 +21,15 @@ createRoot(document.getElementById("raiz")).render(
     <App />
   </React.StrictMode>
 );
+
+// --- Instalable como aplicación ---------------------------------------
+// El "trabajador de servicio" hace que Clack se pueda instalar en el
+// móvil y que abra rápido la segunda vez. Solo se registra en la web ya
+// publicada: durante el desarrollo estorbaría (guardaría versiones viejas).
+if ("serviceWorker" in navigator && import.meta.env.PROD) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/servicio-sin-conexion.js").catch((error) => {
+      console.warn("No se pudo instalar el modo aplicación:", error.message);
+    });
+  });
+}
