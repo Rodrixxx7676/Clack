@@ -164,14 +164,53 @@ Y luego:
 ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo chmod 600 /etc/clack/duckdns.env && sudo mkdir -p /opt/clack/despliegue && sudo cp ~/clack/despliegue/duckdns-actualizar.sh /opt/clack/despliegue/ 2>/dev/null; sudo cp ~/clack/despliegue/duckdns.{service,timer} /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now duckdns.timer'
 ```
 
-### 2. Vigilar el disco
+### 2. El disco está justo: 86% ocupado, ~980 MB libres
 
-El servidor está al **88%** (unos 800 MB libres). Si se llena, n8n deja de
-funcionar. Para hacer sitio:
+Ya se limpió todo lo que se podía (171 MB entre caché de paquetes,
+revisiones viejas de snap e imágenes sin usar) y el disco está **entero
+particionado**: no queda nada más que rascar.
+
+Ojo con un número que engaña: `docker system df` dice que hay 2,8 GB
+"recuperables", pero es mentira. Casi todas esas capas están compartidas
+entre imágenes que sí se usan. Borrar imágenes sueltas libera **menos de
+1 MB**. El desglose real se ve con:
 
 ```bash
-ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'docker system df && docker image prune -af && df -h /'
+ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'docker system df -v | head -12'
 ```
+
+**La solución de verdad es ampliar el volumen EBS de 8 GB a 16 GB**, desde
+la consola de AWS (EC2 → Volúmenes → Modificar). Se hace con la instancia
+encendida y cuesta unos 0,64 USD al mes más. Después, dentro del servidor y
+sin cortar nada:
+
+```bash
+ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo growpart /dev/nvme0n1 1 && sudo resize2fs /dev/nvme0n1p1 && df -h /'
+```
+
+### 3. Swap: pendiente hasta que haya disco
+
+⚠️ **El servidor no tiene swap.** Si un proceso pide un pico de memoria, el
+sistema mata al que más consume: n8n, con sus 584 MB. Un archivo de swap lo
+evitaría, pero **no cabe**: con 980 MB libres, crearlo dejaría el disco al
+borde, y un disco lleno es peor que un pico de memoria.
+
+En cuanto el volumen esté ampliado:
+
+```bash
+ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile && echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab && echo "vm.swappiness=10" | sudo tee /etc/sysctl.d/99-clack-swap.conf && sudo sysctl -q vm.swappiness=10 && free -m'
+```
+
+### 4. Consumo real de cada aplicación
+
+| | RAM | Disco (único) |
+|---|---|---|
+| n8n | 584 MB | 2,47 GB |
+| Caddy | 13 MB | 88 MB |
+| Clack | 16 MB | 67 MB |
+
+Clack pesa 16 MB de memoria: en el servidor caben **muchas más**
+aplicaciones como esta. El límite no es la memoria, es el disco.
 
 ---
 

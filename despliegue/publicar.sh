@@ -42,7 +42,9 @@ ssh -i "$LLAVE" "$SERVIDOR" '
   docker build -q -f despliegue/Dockerfile -t clack:latest .
   docker rm -f clack >/dev/null 2>&1 || true
   docker run -d --name clack --restart unless-stopped \
-    --network n8n-docker_default --memory 256m clack:latest >/dev/null
+    --network n8n-docker_default --memory 256m \
+    --log-opt max-size=10m --log-opt max-file=3 \
+    clack:latest >/dev/null
   docker image prune -f >/dev/null    # borra la imagen vieja: el disco va justo
   sleep 5
   docker ps --filter name=clack --format "   {{.Names}} | {{.Status}}"
