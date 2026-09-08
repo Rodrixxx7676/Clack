@@ -47,6 +47,17 @@ export class Ciudad {
   }
 
   /**
+   * El desfase con tu hora, en número (puede tener media hora: 5.5).
+   * Es lo que usan los cálculos; diferenciaContigo() es para mostrar.
+   */
+  desfaseEnHorasContigo(momento = new Date()) {
+    const minutos =
+      minutosDesdeUTC(this.zonaHoraria, momento) -
+      minutosDesdeUTC(Reloj.zonaHorariaDelDispositivo(), momento);
+    return minutos / 60;
+  }
+
+  /**
    * Cuántas horas de diferencia hay con la hora de tu dispositivo.
    * Ejemplos: "+7 h", "-5:30 h", "Tu misma hora".
    */

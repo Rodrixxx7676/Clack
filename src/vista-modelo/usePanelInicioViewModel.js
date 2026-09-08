@@ -30,6 +30,7 @@ export function usePanelInicioViewModel(ciudades = CIUDADES) {
     enfocarCiudad,
 
     hayCiudades: Boolean(ciudadActiva),
+    climaPorCiudad: clima.climaPorCiudad, // lo usa la tabla de reuniones
 
     // Datos ya listos para mostrar de la ciudad enfocada.
     ciudadActiva: ciudadActiva && {

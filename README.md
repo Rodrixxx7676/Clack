@@ -92,7 +92,10 @@ Clack/
     │   ├── ServicioDelClima.js      Le pregunta la temperatura a internet
     │   ├── ServicioRecaptcha.js     Comprueba que quien entra es persona
     │   ├── ServicioDeFavoritos.js   Las ciudades elegidas por cada persona
-    │   └── ServicioDeBusquedaDeCiudades.js  Busca ciudades del mundo
+    │   ├── ServicioDeBusquedaDeCiudades.js  Busca ciudades del mundo
+    │   ├── PlanificadorDeReuniones.js  ¿A qué hora nos viene bien a todos?
+    │   ├── EnlaceDeReunion.js       Convierte una reunión en un enlace
+    │   └── AlmacenDeAlarmas.js      Los avisos por hora de otra ciudad
     │
     ├── vista-modelo/           ← 2. VIEWMODEL: el cerebro de cada pantalla
     │   ├── useSesion.js             Quién está conectado ahora
@@ -187,6 +190,16 @@ bajando. El primero es el carrusel de ciudades; el segundo, un video del
 globo terráqueo de fondo con el mensaje de la marca. Para añadir otro piso,
 se agrega una sección más en `PanelInicio.jsx`.
 
+**¿A qué hora hablamos?** El tercer piso del panel muestra un día entero de
+cada ciudad: casillas claras de día, oscuras de noche (con la salida y puesta
+de sol reales) y una barra verde en las horas de oficina. Propone las mejores
+horas para hablar y deja compartir la elegida con un enlace que **funciona sin
+tener cuenta**: las zonas horarias viajan dentro de la dirección.
+
+**Avisos:** «avísame cuando en Tokio sean las 9:00». Se guardan en el propio
+dispositivo, no en el servidor: un aviso lo tiene que dar el aparato que
+tienes delante, no el computador que dejaste en la oficina.
+
 **Instalable como app (PWA):** Clack se puede instalar en el móvil desde el
 navegador y queda con su icono, como cualquier otra aplicación. Abre rápido
 la segunda vez y muestra algo aunque no haya internet.
@@ -271,7 +284,7 @@ Lo que pide la planificación y en qué va cada cosa:
 - [x] **Paso 5 —** Registro de usuarios con la entidad USUARIO completa.
 - [x] **Paso 6 —** Ciudades favoritas: buscar, elegir y ordenar (hasta 10).
 - [x] **Paso 7 —** Instalable como aplicación (PWA).
-- [ ] **Paso 8 —** Vista de reuniones, línea de día y noche, alarmas y enlaces para compartir.
+- [x] **Paso 8 —** Vista de reuniones, línea de día y noche, avisos por hora y enlaces para compartir.
 - [ ] **Paso 9 —** OAuth 2.0 (Google/Microsoft).
 
 ---

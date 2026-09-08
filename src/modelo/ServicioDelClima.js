@@ -23,6 +23,8 @@ export class ServicioDelClima {
       latitude: ciudades.map((ciudad) => ciudad.latitud).join(","),
       longitude: ciudades.map((ciudad) => ciudad.longitud).join(","),
       current: "temperature_2m,weather_code,is_day",
+      daily: "sunrise,sunset",
+      forecast_days: "1",
       timezone: "auto",
     });
 
@@ -37,18 +39,31 @@ export class ServicioDelClima {
 
     const climaPorCiudad = new Map();
     ciudades.forEach((ciudad, posicion) => {
-      const actual = lugares[posicion]?.current;
+      const lugar = lugares[posicion];
+      const actual = lugar?.current;
       if (!actual) return;
+
       climaPorCiudad.set(
         ciudad.id,
         new Clima({
           temperatura: actual.temperature_2m,
           codigo: actual.weather_code,
           esDeDia: actual.is_day === 1,
+          amanecer: horaDecimalDe(lugar.daily?.sunrise?.[0]),
+          atardecer: horaDecimalDe(lugar.daily?.sunset?.[0]),
         })
       );
     });
 
     return climaPorCiudad;
   }
+}
+
+/** De "2026-09-08T06:07" saca 6.117 (las 6 horas y 7 minutos). */
+function horaDecimalDe(textoIso) {
+  if (!textoIso) return null;
+  const hora = textoIso.slice(11, 16); // "06:07"
+  const [horas, minutos] = hora.split(":").map(Number);
+  if (Number.isNaN(horas)) return null;
+  return horas + minutos / 60;
 }

@@ -11,6 +11,7 @@ export default function EncabezadoPanel({
   horaLocal,
   alCerrarSesion,
   alAbrirCiudades,
+  alAbrirAlarmas,
 }) {
   return (
     <CajaVidrio className="encabezado-panel" como="header">
@@ -26,6 +27,9 @@ export default function EncabezadoPanel({
       <div className="encabezado-panel__acciones">
         <button className="boton-vidrio" type="button" onClick={alAbrirCiudades}>
           Mis ciudades
+        </button>
+        <button className="boton-vidrio" type="button" onClick={alAbrirAlarmas}>
+          Avisos
         </button>
         <button className="boton-vidrio" type="button" onClick={alCerrarSesion}>
           Cerrar sesión

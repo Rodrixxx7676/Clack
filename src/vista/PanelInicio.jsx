@@ -4,7 +4,8 @@
  * La pantalla principal de Clack, en "pisos" que se recorren bajando:
  *
  *   1. El carrusel de ciudades con su hora y su clima
- *   2. El globo terráqueo en video, con el mensaje de la marca
+ *   2. ¿A qué hora hablamos? La tabla de 24 horas de cada ciudad
+ *   3. El globo terráqueo en video, con el mensaje de la marca
  *
  * Para agregar otro piso, se añade una <section> más aquí abajo.
  *
@@ -14,6 +15,7 @@
 import { useState } from "react";
 import { usePanelInicioViewModel } from "../vista-modelo/usePanelInicioViewModel.js";
 import { useCiudadesFavoritas } from "../vista-modelo/useCiudadesFavoritas.js";
+import { useAlarmas } from "../vista-modelo/useAlarmas.js";
 import { useRelojLocal } from "../vista-modelo/useRelojLocal.js";
 import FondoWebThreads from "./fondos/FondoWebThreads.jsx";
 import CarruselCiudades from "./carruseles/CarruselCiudades.jsx";
@@ -21,12 +23,17 @@ import EncabezadoPanel from "./componentes/EncabezadoPanel.jsx";
 import DetalleCiudad from "./componentes/DetalleCiudad.jsx";
 import SeccionGlobo from "./componentes/SeccionGlobo.jsx";
 import GestorDeCiudades from "./componentes/GestorDeCiudades.jsx";
+import SeccionReuniones from "./componentes/SeccionReuniones.jsx";
+import GestorDeAlarmas from "./componentes/GestorDeAlarmas.jsx";
+import AvisoDeAlarma from "./componentes/AvisoDeAlarma.jsx";
 
 export default function PanelInicio({ usuario, alCerrarSesion }) {
   const favoritos = useCiudadesFavoritas();
   const vm = usePanelInicioViewModel(favoritos.ciudades);
   const relojLocal = useRelojLocal();
+  const alarmas = useAlarmas();
   const [gestorAbierto, setGestorAbierto] = useState(false);
+  const [alarmasAbiertas, setAlarmasAbiertas] = useState(false);
 
   return (
     <div className="panel-inicio">
@@ -38,6 +45,7 @@ export default function PanelInicio({ usuario, alCerrarSesion }) {
           horaLocal={relojLocal.hora}
           alCerrarSesion={alCerrarSesion}
           alAbrirCiudades={() => setGestorAbierto(true)}
+          alAbrirAlarmas={() => setAlarmasAbiertas(true)}
         />
 
         <main className="panel-inicio__centro" id="ciudades">
@@ -56,7 +64,7 @@ export default function PanelInicio({ usuario, alCerrarSesion }) {
             </p>
           )}
 
-          <a className="panel-inicio__bajar" href="#globo" aria-label="Ver la siguiente sección">
+          <a className="panel-inicio__bajar" href="#reuniones" aria-label="Ver la siguiente sección">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
                 d="m6 9 6 6 6-6"
@@ -70,6 +78,10 @@ export default function PanelInicio({ usuario, alCerrarSesion }) {
         </main>
       </div>
 
+      <div id="reuniones">
+        <SeccionReuniones ciudades={vm.ciudades} climaPorCiudad={vm.climaPorCiudad} />
+      </div>
+
       <div id="globo">
         <SeccionGlobo totalDeCiudades={vm.ciudades.length} />
       </div>
@@ -79,6 +91,15 @@ export default function PanelInicio({ usuario, alCerrarSesion }) {
         alCerrar={() => setGestorAbierto(false)}
         favoritos={favoritos}
       />
+
+      <GestorDeAlarmas
+        abierto={alarmasAbiertas}
+        alCerrar={() => setAlarmasAbiertas(false)}
+        alarmas={alarmas}
+        ciudades={vm.ciudades}
+      />
+
+      <AvisoDeAlarma texto={alarmas.ultimoAviso} alCerrar={alarmas.descartarAviso} />
     </div>
   );
 }

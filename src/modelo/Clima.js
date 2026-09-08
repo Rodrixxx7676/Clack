@@ -8,10 +8,24 @@
  * Mundial (WMO). Aquí lo traducimos a algo que una persona entienda.
  */
 export class Clima {
-  constructor({ temperatura, codigo, esDeDia = true }) {
+  /**
+   * @param amanecer  a qué hora sale el sol, en horas decimales (6.5 = 6:30)
+   * @param atardecer a qué hora se pone
+   */
+  constructor({ temperatura, codigo, esDeDia = true, amanecer = null, atardecer = null }) {
     this.temperatura = temperatura;
     this.codigo = codigo;
     this.esDeDia = esDeDia;
+    this.amanecer = amanecer;
+    this.atardecer = atardecer;
+  }
+
+  /** "06:07", listo para mostrar. */
+  static horaEnTexto(horaDecimal) {
+    if (horaDecimal === null || horaDecimal === undefined) return null;
+    const horas = Math.floor(horaDecimal);
+    const minutos = Math.round((horaDecimal - horas) * 60);
+    return `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
   }
 
   /** Ejemplo: "22°". */

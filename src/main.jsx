@@ -15,6 +15,7 @@ import "./estilos/base.css";
 import "./estilos/liquid-glass.css";
 import "./estilos/login.css";
 import "./estilos/panel-inicio.css";
+import "./estilos/reuniones.css";
 
 createRoot(document.getElementById("raiz")).render(
   <React.StrictMode>
