@@ -46,39 +46,24 @@ function cargarRecaptcha() {
 
 export class ServicioRecaptcha {
   /**
-   * Pide la ficha a Google y deja que el servidor la revise.
-   * @param {string} accion nombre de lo que se está haciendo, ej. "iniciar_sesion"
-   * @returns {Promise<{aprobado: boolean, puntuacion: number|null, motivo: string}>}
+   * Pide a Google la ficha que demuestra que esto lo hace una persona.
+   *
+   * Si Google no responde o el dominio no está registrado (típico al
+   * desarrollar en localhost), devuelve null. NO se decide nada aquí:
+   * la ficha viaja con el formulario y es el servidor quien manda. Si
+   * tiene la clave secreta configurada, rechazará lo que llegue sin
+   * ficha; si no la tiene, dejará pasar. Así el navegador nunca puede
+   * saltarse el control.
+   *
+   * @param {string} accion qué se está haciendo, ej. "registro"
+   * @returns {Promise<string|null>}
    */
-  async comprobar(accion) {
-    // Si Google no responde o el dominio no está registrado (típico al
-    // desarrollar en localhost), se envía sin ficha. NO se decide aquí:
-    // el servidor es siempre quien manda. Si tiene la clave secreta
-    // configurada, rechazará la petición sin ficha; si no la tiene,
-    // dejará pasar. Así el navegador nunca puede saltarse el control.
-    let ficha = null;
+  async obtenerFicha(accion) {
     try {
       const recaptcha = await cargarRecaptcha();
-      ficha = await recaptcha.execute(CLAVE_DE_SITIO, { action: accion });
+      return await recaptcha.execute(CLAVE_DE_SITIO, { action: accion });
     } catch {
-      ficha = null;
+      return null;
     }
-
-    const respuesta = await fetch("/api/verificar-recaptcha", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ficha, accion }),
-    });
-
-    if (!respuesta.ok) {
-      // 400 = el servidor pide ficha y no llegó; 502 = Google no responde.
-      return {
-        aprobado: false,
-        puntuacion: null,
-        motivo: "El servidor no pudo verificar la ficha",
-      };
-    }
-
-    return respuesta.json();
   }
 }

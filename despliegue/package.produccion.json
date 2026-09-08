@@ -4,6 +4,7 @@
   "type": "module",
   "description": "Solo lo que el servidor necesita para funcionar. La web ya viene construida.",
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "bcryptjs": "^2.4.3"
   }
 }

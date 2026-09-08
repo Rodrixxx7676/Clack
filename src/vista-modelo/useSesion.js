@@ -25,10 +25,20 @@ export function useSesion(servicio = servicioPorDefecto) {
     [servicio]
   );
 
+  /** Crea una cuenta nueva y entra con ella. */
+  const registrar = useCallback(
+    async (datos) => {
+      const usuarioNuevo = await servicio.registrar(datos);
+      setUsuario(usuarioNuevo);
+      return usuarioNuevo;
+    },
+    [servicio]
+  );
+
   const salir = useCallback(() => {
     servicio.cerrarSesion();
     setUsuario(null);
   }, [servicio]);
 
-  return { usuario, entrar, salir };
+  return { usuario, entrar, registrar, salir };
 }

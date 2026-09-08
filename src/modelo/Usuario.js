@@ -1,22 +1,33 @@
 /**
  * Usuario.js
  * ----------
- * Representa a la persona que entra a Clack.
- * Es un dato puro: no sabe nada de pantallas ni de botones.
+ * La persona que usa Clack.
+ *
+ * Corresponde a la entidad USUARIO de la planificación:
+ *
+ *   ID_USUARIO       →  id
+ *   NOMBRE           →  nombre
+ *   APELLIDO         →  apellido
+ *   CORREO           →  correo
+ *   CONTRASEÑA       →  (no está aquí a propósito: vive cifrada en el
+ *                        servidor y nunca viaja al navegador)
+ *   FECHA_NACIMIENTO →  fechaDeNacimiento
+ *   PAIS_ORIGEN      →  paisDeOrigen
+ *   FECHA_REGISTRO   →  fechaDeRegistro
  */
 export class Usuario {
-  constructor({ correo, nombre }) {
+  constructor({ id, nombre, apellido, correo, fechaDeNacimiento, paisDeOrigen, fechaDeRegistro }) {
+    this.id = id;
+    this.nombre = nombre;
+    this.apellido = apellido;
     this.correo = correo;
-    this.nombre = nombre ?? Usuario.nombreDesdeCorreo(correo);
+    this.fechaDeNacimiento = fechaDeNacimiento;
+    this.paisDeOrigen = paisDeOrigen;
+    this.fechaDeRegistro = fechaDeRegistro;
   }
 
-  /** De "ana.perez@correo.com" saca "Ana Perez". */
-  static nombreDesdeCorreo(correo) {
-    const parteInicial = String(correo).split("@")[0] ?? "";
-    return parteInicial
-      .split(/[._-]+/)
-      .filter(Boolean)
-      .map((palabra) => palabra.charAt(0).toUpperCase() + palabra.slice(1))
-      .join(" ");
+  /** "Ana Pérez", para saludar. */
+  get nombreCompleto() {
+    return [this.nombre, this.apellido].filter(Boolean).join(" ");
   }
 }

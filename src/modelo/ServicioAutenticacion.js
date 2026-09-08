@@ -1,50 +1,80 @@
 /**
  * ServicioAutenticacion.js
  * ------------------------
- * Se encarga de "entrar" y "salir" de la aplicación.
+ * Crear cuenta, entrar y salir de Clack.
  *
- * IMPORTANTE (versión de demostración):
- * Todavía no hay servidor, así que la cuenta de prueba está escrita aquí
- * y la sesión se guarda en el navegador. Cuando exista un backend real,
- * solo se cambia este archivo: ni la Vista ni el ViewModel se tocan.
+ * Habla con NUESTRO servidor (las rutas /api/registro y /api/inicio-sesion).
+ * Allí es donde se guardan las cuentas y donde se comprueban las
+ * contraseñas, que están cifradas. Aquí no hay ninguna contraseña
+ * guardada ni ninguna decisión de seguridad: solo se piden y se muestran
+ * los resultados.
+ *
+ * Antes de cada petición se pide la ficha de reCAPTCHA y se envía junto
+ * con los datos; el servidor la verifica antes de hacer nada.
  */
 import { Usuario } from "./Usuario.js";
-
-const CUENTA_DEMO = {
-  correo: "demo@clack.app",
-  contrasena: "clack1234",
-  nombre: "Invitada Demo",
-};
+import { ServicioRecaptcha } from "./ServicioRecaptcha.js";
 
 const LLAVE_SESION = "clack.sesion";
-const DEMORA_SIMULADA_MS = 700;
+
+/** Lee la respuesta del servidor y lanza un error legible si algo falló. */
+async function leerRespuesta(respuesta) {
+  let datos = {};
+  try {
+    datos = await respuesta.json();
+  } catch {
+    // El servidor no devolvió JSON: nos quedamos con el error genérico.
+  }
+
+  if (!respuesta.ok) {
+    const error = new Error(datos.error ?? "No pudimos completar la operación.");
+    error.errores = datos.errores ?? null; // errores por campo, si los hay
+    throw error;
+  }
+
+  return datos;
+}
 
 export class ServicioAutenticacion {
-  /**
-   * Intenta iniciar sesión.
-   * @returns {Promise<Usuario>} el usuario cuando las credenciales son correctas.
-   * @throws {Error} con un mensaje listo para mostrar cuando no lo son.
-   */
+  constructor(recaptcha = new ServicioRecaptcha()) {
+    this.recaptcha = recaptcha;
+  }
+
+  /** Crea una cuenta nueva y deja la sesión iniciada. */
+  async registrar(datos) {
+    const fichaRecaptcha = await this.recaptcha.obtenerFicha("registro");
+
+    const respuesta = await fetch("/api/registro", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...datos, fichaRecaptcha }),
+    });
+
+    const { usuario } = await leerRespuesta(respuesta);
+    const nuevoUsuario = new Usuario(usuario);
+    this.#guardarSesion(nuevoUsuario, datos.recordarme ?? true);
+    return nuevoUsuario;
+  }
+
+  /** Entra con una cuenta que ya existe. */
   async iniciarSesion({ correo, contrasena, recordarme = false }) {
-    await esperar(DEMORA_SIMULADA_MS); // simula el viaje al servidor
+    const fichaRecaptcha = await this.recaptcha.obtenerFicha("iniciar_sesion");
 
-    const correoLimpio = String(correo).trim().toLowerCase();
-    const credencialesCorrectas =
-      correoLimpio === CUENTA_DEMO.correo && contrasena === CUENTA_DEMO.contrasena;
+    const respuesta = await fetch("/api/inicio-sesion", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ correo, contrasena, fichaRecaptcha }),
+    });
 
-    if (!credencialesCorrectas) {
-      throw new Error("Correo o contraseña incorrectos.");
-    }
-
-    const usuario = new Usuario({ correo: CUENTA_DEMO.correo, nombre: CUENTA_DEMO.nombre });
-    this.#guardarSesion(usuario, recordarme);
-    return usuario;
+    const { usuario } = await leerRespuesta(respuesta);
+    const usuarioConectado = new Usuario(usuario);
+    this.#guardarSesion(usuarioConectado, recordarme);
+    return usuarioConectado;
   }
 
   /** Devuelve el usuario de la sesión guardada, o null si nadie entró. */
   recuperarSesion() {
-    const almacenes = [window.localStorage, window.sessionStorage];
-    for (const almacen of almacenes) {
+    for (const almacen of [window.localStorage, window.sessionStorage]) {
       try {
         const guardado = almacen.getItem(LLAVE_SESION);
         if (guardado) return new Usuario(JSON.parse(guardado));
@@ -55,7 +85,6 @@ export class ServicioAutenticacion {
     return null;
   }
 
-  /** Cierra la sesión en todos lados. */
   cerrarSesion() {
     for (const almacen of [window.localStorage, window.sessionStorage]) {
       try {
@@ -68,20 +97,16 @@ export class ServicioAutenticacion {
 
   /** Datos de la cuenta de prueba, para mostrarlos como ayuda en pantalla. */
   static get cuentaDemo() {
-    return { correo: CUENTA_DEMO.correo, contrasena: CUENTA_DEMO.contrasena };
+    return { correo: "demo@clack.app", contrasena: "clack1234" };
   }
 
   #guardarSesion(usuario, recordarme) {
     // "Recordarme" = queda guardada aunque cierres el navegador.
     const almacen = recordarme ? window.localStorage : window.sessionStorage;
     try {
-      almacen.setItem(LLAVE_SESION, JSON.stringify({ correo: usuario.correo, nombre: usuario.nombre }));
+      almacen.setItem(LLAVE_SESION, JSON.stringify({ ...usuario }));
     } catch {
       // Modo privado: la sesión solo dura mientras la página esté abierta.
     }
   }
-}
-
-function esperar(milisegundos) {
-  return new Promise((resolver) => setTimeout(resolver, milisegundos));
 }

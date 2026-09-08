@@ -12,6 +12,7 @@
     "publicar": "npm run build && npm run servidor"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "express": "^4.22.2",
     "gsap": "^3.15.0",
     "ogl": "^1.0.11",

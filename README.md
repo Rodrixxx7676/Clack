@@ -56,8 +56,14 @@ Clack/
 ├── package.json                ← Lista de herramientas que usa el proyecto
 ├── vite.config.js              ← Configuración del servidor de desarrollo
 ├── DESPLIEGUE.md               ← Cómo poner Clack en internet
+├── comun/
+│   └── reglasDeUsuario.js      ← Reglas que usan la web Y el servidor
 ├── servidor/
-│   └── servidor.js             ← Entrega la web en el puerto 3001
+│   ├── servidor.js             ← Entrega la web en el puerto 3001
+│   ├── seguridad/recaptcha.js  ← Comprueba las fichas con Google
+│   └── usuarios/
+│       ├── almacenDeUsuarios.js   Guarda las cuentas (contraseñas cifradas)
+│       └── rutasDeUsuarios.js     /api/registro y /api/inicio-sesion
 ├── despliegue/
 │   ├── publicar.sh             ← 👈 Sube una versión nueva a internet
 │   ├── Dockerfile              ← La imagen de Clack para el servidor
@@ -175,6 +181,12 @@ bajando. El primero es el carrusel de ciudades; el segundo, un video del
 globo terráqueo de fondo con el mensaje de la marca. Para añadir otro piso,
 se agrega una sección más en `PanelInicio.jsx`.
 
+**Cuentas de usuario:** el registro y el login ocurren en el servidor. Las
+contraseñas se guardan cifradas con **bcrypt**, que es de un solo sentido:
+ni nosotros podemos leerlas. Las reglas de validación viven en
+`comun/reglasDeUsuario.js` y las usan **los dos lados**, porque el servidor
+no puede fiarse de lo que llega del navegador.
+
 **Seguridad del login:** [reCAPTCHA v3](https://www.google.com/recaptcha) de
 Google. Es invisible: puntúa el comportamiento del visitante del 0 al 1 y el
 **servidor** decide si pasa. La clave secreta vive solo dentro del servidor;
@@ -217,9 +229,9 @@ Lo que pide la planificación y en qué va cada cosa:
 | Requisito | Estado |
 | --------- | ------ |
 | Ver la hora de varias ciudades a la vez (hasta 10) | 🟡 Se ven 6 ciudades fijas; falta que cada usuario elija las suyas |
-| Registrarse e iniciar sesión con correo y contraseña | 🟡 El login funciona (cuenta de prueba); falta el registro y un servidor real |
+| Registrarse e iniciar sesión con correo y contraseña | 🟢 Registro y login contra el servidor, con contraseñas cifradas (bcrypt) |
 | Inicio de sesión con Google o Microsoft (OAuth 2.0) | 🔴 Pendiente — necesita servidor |
-| Seguridad: reCAPTCHA en registro y login | 🟡 Hecho en el login, validado en el servidor; falta el registro |
+| Seguridad: reCAPTCHA en registro y login | 🟢 En los dos formularios, verificado en el servidor |
 | Rendimiento: los relojes en menos de 2 segundos | 🟢 Los relojes salen al instante y la temperatura tarda ~0,3 s |
 | Interfaz 100% responsive (Android e iOS) | 🟢 Probado en móvil, tablet y escritorio |
 
@@ -231,7 +243,7 @@ Lo que pide la planificación y en qué va cada cosa:
 | Entidad | Dónde está |
 | ------- | ---------- |
 | `CIUDAD` | `src/modelo/Ciudad.js` (`ID_ZONA` → `id`, `NOMBRE_CIUDAD` → `nombre`, `CODIGO_ZONA` → `zonaHoraria`) |
-| `USUARIO` | `src/modelo/Usuario.js` — por ahora solo correo y nombre |
+| `USUARIO` | `src/modelo/Usuario.js` (web) y `servidor/usuarios/almacenDeUsuarios.js` (datos). Los ocho atributos, con la contraseña cifrada |
 | `FAVORITO` | Todavía no existe: hoy la lista de ciudades es fija para todos |
 
 ---
@@ -242,8 +254,9 @@ Lo que pide la planificación y en qué va cada cosa:
 - [x] **Paso 2 —** Panel de inicio con el carrusel de ciudades y su hora en vivo.
 - [x] **Paso 3 —** Temperatura actual de cada ciudad.
 - [x] **Paso 4 —** reCAPTCHA v3 en el login, verificado en el servidor.
-- [ ] **Paso 5 —** Registro de usuarios y ciudades favoritas (hasta 10).
-- [ ] **Paso 6 —** Servidor real: cuentas con contraseñas cifradas y OAuth 2.0.
+- [x] **Paso 5 —** Registro de usuarios con la entidad USUARIO completa.
+- [ ] **Paso 6 —** Ciudades favoritas: buscar, elegir y ordenar (hasta 10).
+- [ ] **Paso 7 —** OAuth 2.0 (Google/Microsoft) y sesiones con token.
 
 ---
 

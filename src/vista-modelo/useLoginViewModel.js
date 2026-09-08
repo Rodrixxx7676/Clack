@@ -9,16 +9,13 @@
  *
  * Quién queda conectado NO se decide aquí, sino en useSesion (App.jsx).
  * Este hook solo recibe la función `entrar` y avisa si algo salió mal.
+ * La comprobación de la contraseña y el reCAPTCHA ocurren en el servidor.
  */
 import { useCallback, useState } from "react";
 import { ServicioAutenticacion } from "../modelo/ServicioAutenticacion.js";
-import { ServicioRecaptcha } from "../modelo/ServicioRecaptcha.js";
 import { revisarCorreo, revisarContrasena } from "../modelo/ValidadorCredenciales.js";
 
-// Una sola instancia para toda la pantalla.
-const recaptchaPorDefecto = new ServicioRecaptcha();
-
-export function useLoginViewModel({ entrar, recaptcha = recaptchaPorDefecto }) {
+export function useLoginViewModel({ entrar }) {
   // Lo que el usuario escribe.
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
@@ -72,23 +69,15 @@ export function useLoginViewModel({ entrar, recaptcha = recaptchaPorDefecto }) {
     setCargando(true);
     setErrorGeneral(null);
     try {
-      // Primero: comprobar que quien entra es una persona.
-      const comprobacion = await recaptcha.comprobar("iniciar_sesion");
-      if (!comprobacion.aprobado) {
-        setErrorGeneral(
-          "No pudimos confirmar que eres una persona. Recarga la página e inténtalo otra vez."
-        );
-        setCargando(false);
-        return;
-      }
-
+      // El servicio pide la ficha de reCAPTCHA y la envía junto con los
+      // datos; el servidor la verifica antes de comprobar la contraseña.
       await entrar({ correo, contrasena, recordarme });
       // Si todo salió bien, App.jsx cambia solo a la pantalla del panel.
     } catch (error) {
       setErrorGeneral(error.message);
       setCargando(false);
     }
-  }, [cargando, contrasena, correo, entrar, recaptcha, recordarme]);
+  }, [cargando, contrasena, correo, entrar, recordarme]);
 
   const mostrarAyudaContrasena = useCallback((correoSoporte) => {
     setErrorGeneral(`Escríbenos a ${correoSoporte} y te ayudamos a recuperarla.`);

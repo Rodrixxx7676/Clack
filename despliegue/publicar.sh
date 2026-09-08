@@ -28,7 +28,7 @@ paso "1/4 Construyendo la web"
 npm run build
 
 paso "2/4 Empaquetando y enviando"
-tar czf "$PAQUETE" dist servidor despliegue/Dockerfile despliegue/package.produccion.json
+tar czf "$PAQUETE" dist servidor comun despliegue/Dockerfile despliegue/package.produccion.json
 du -h "$PAQUETE"
 ssh -i "$LLAVE" "$SERVIDOR" 'rm -rf ~/clack && mkdir -p ~/clack && cat > ~/clack/envio.tgz' < "$PAQUETE"
 rm -f "$PAQUETE"
@@ -52,9 +52,12 @@ ssh -i "$LLAVE" "$SERVIDOR" '
     echo "   ⚠️  sin /etc/clack/recaptcha.env: el login quedará sin reCAPTCHA"
   fi
 
+  # El volumen guarda las cuentas registradas: sin él, cada despliegue
+  # las borraría.
   docker run -d --name clack --restart unless-stopped \
     --network n8n-docker_default --memory 256m \
     --log-opt max-size=10m --log-opt max-file=3 \
+    -v clack_datos:/app/datos \
     $SECRETOS \
     clack:latest >/dev/null
   docker image prune -f >/dev/null    # borra la imagen vieja: el disco va justo

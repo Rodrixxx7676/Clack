@@ -20,7 +20,7 @@ import InterruptorRecordarme from "./componentes/InterruptorRecordarme.jsx";
 
 const CORREO_SOPORTE = "hola@clack.app";
 
-export default function PantallaLogin({ alEntrar }) {
+export default function PantallaLogin({ alEntrar, alQuererRegistrarse }) {
   const vm = useLoginViewModel({ entrar: alEntrar });
   const reloj = useRelojLocal();
 
@@ -106,17 +106,38 @@ export default function PantallaLogin({ alEntrar }) {
             >
               {vm.cargando ? "Entrando…" : "Entrar"}
             </button>
+
+            <p className="formulario__aviso">
+              Protegido por reCAPTCHA de Google. Se aplican su{" "}
+              <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">
+                Política de Privacidad
+              </a>{" "}
+              y sus{" "}
+              <a href="https://policies.google.com/terms" target="_blank" rel="noreferrer">
+                Términos del Servicio
+              </a>
+              .
+            </p>
           </form>
 
-          <footer className="tarjeta__pie">
-            <p>
-              ¿Solo quieres mirar?
-              <br />
-              Usa la cuenta de prueba.
-            </p>
-            <button className="boton-vidrio" type="button" onClick={vm.usarCuentaDemo}>
-              Cuenta demo
-            </button>
+          <footer className="tarjeta__pie tarjeta__pie--doble">
+            <div className="tarjeta__pie-fila">
+              <p>
+                ¿Todavía no tienes cuenta?
+                <br />
+                Se crea en un minuto.
+              </p>
+              <button className="boton-vidrio" type="button" onClick={alQuererRegistrarse}>
+                Crear cuenta
+              </button>
+            </div>
+
+            <div className="tarjeta__pie-fila">
+              <p>¿Solo quieres mirar? Usa la cuenta de prueba.</p>
+              <button className="enlace" type="button" onClick={vm.usarCuentaDemo}>
+                Usar cuenta demo
+              </button>
+            </div>
           </footer>
         </CajaVidrio>
       </main>

@@ -40,6 +40,7 @@
   position: relative;
   z-index: 1;
   width: min(430px, 100%);
+  margin: auto 0;
   display: grid;
   animation: aparecer 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -131,11 +132,36 @@
   color: var(--texto-suave);
 }
 
+/* El registro necesita más ancho: lleva campos de dos en dos. */
+.pantalla-login__contenido--ancho {
+  width: min(620px, 100%);
+}
+
 /* --- Formulario --------------------------------------------------------- */
 .formulario {
   display: flex;
   flex-direction: column;
   gap: 18px;
+}
+
+/* Dos campos lado a lado (nombre y apellido, fecha y país). */
+.formulario__pareja {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+/* El aviso legal que exige Google al usar reCAPTCHA. */
+.formulario__aviso {
+  margin: -4px 0 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--texto-tenue);
+  text-align: center;
+}
+
+.formulario__aviso a {
+  color: var(--turquesa-medio);
 }
 
 .formulario__opciones {
@@ -154,6 +180,20 @@
   gap: 14px;
   padding-top: 18px;
   border-top: 1px solid rgba(15, 118, 110, 0.16);
+}
+
+/* El pie del login lleva dos filas: crear cuenta y cuenta de prueba. */
+.tarjeta__pie--doble {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.tarjeta__pie-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
 }
 
 .tarjeta__pie p {
@@ -183,9 +223,14 @@
     font-size: 22px;
   }
 
-  .tarjeta__pie {
+  .tarjeta__pie,
+  .tarjeta__pie-fila {
     flex-direction: column;
     align-items: stretch;
     text-align: center;
+  }
+
+  .formulario__pareja {
+    grid-template-columns: 1fr;
   }
 }

@@ -21,9 +21,15 @@ WORKDIR /app
 COPY despliegue/package.produccion.json ./package.json
 RUN npm install --omit=dev && npm cache clean --force
 
-# La web ya construida y el servidor que la entrega.
+# La web ya construida, el servidor que la entrega y las reglas que
+# comparten los dos (comun/).
 COPY dist ./dist
 COPY servidor ./servidor
+COPY comun ./comun
+
+# Aquí se guardan las cuentas. Es un volumen: sobrevive a los despliegues.
+RUN mkdir -p /app/datos
+VOLUME ["/app/datos"]
 
 ENV NODE_ENV=production
 # Dentro de un contenedor hay que escuchar en 0.0.0.0 para que Caddy,
