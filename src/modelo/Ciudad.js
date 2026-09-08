@@ -13,11 +13,12 @@
  * Y además, para que la app funcione:
  *   latitud / longitud →  para consultar la temperatura
  *   foto               →  la imagen que se ve en el carrusel
+ *   descripcion        →  una línea sobre la ciudad, para el panel
  */
 import { Reloj } from "./Reloj.js";
 
 export class Ciudad {
-  constructor({ id, nombre, pais, zonaHoraria, latitud, longitud, foto }) {
+  constructor({ id, nombre, pais, zonaHoraria, latitud, longitud, foto, descripcion }) {
     this.id = id;
     this.nombre = nombre;
     this.pais = pais;
@@ -25,6 +26,7 @@ export class Ciudad {
     this.latitud = latitud;
     this.longitud = longitud;
     this.foto = foto;
+    this.descripcion = descripcion;
     this.reloj = new Reloj({ zonaHoraria });
   }
 

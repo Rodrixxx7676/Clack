@@ -153,7 +153,10 @@ new Ciudad({
   nombre: "Madrid",
   pais: "España",
   zonaHoraria: "Europe/Madrid",   // nombre oficial IANA
+  latitud: 40.4168,               // para pedir la temperatura
+  longitud: -3.7038,
   foto: "https://...",
+  descripcion: "Una o dos frases sobre la ciudad.",
 }),
 ```
 

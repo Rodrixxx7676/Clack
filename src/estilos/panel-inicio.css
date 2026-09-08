@@ -125,11 +125,11 @@
 }
 
 .detalle-ciudad .caja-vidrio__cuerpo {
-  padding: 16px 24px;
+  padding: 16px 24px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 14px 20px;
   flex-wrap: wrap;
 }
 
@@ -177,6 +177,16 @@
 
 .detalle-ciudad__fecha::first-letter {
   text-transform: uppercase;
+}
+
+/* La reseña de la ciudad, debajo de la hora. */
+.detalle-ciudad__descripcion {
+  width: 100%;
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--texto-suave);
+  text-wrap: pretty;
 }
 
 .detalle-ciudad__datos {
@@ -242,6 +252,39 @@
   }
 }
 
+/* --- Pantallas de poca altura -------------------------------------------
+   En monitores bajos (portátiles de 720px) todo junto no cabía y aparecía
+   una barra de desplazamiento. Aquí se aprieta un poco para que entre.
+   ------------------------------------------------------------------------- */
+@media (min-width: 621px) and (max-height: 800px) {
+  .panel-inicio__contenido {
+    padding: 12px 20px 14px;
+    gap: 12px;
+  }
+
+  .panel-inicio__centro {
+    gap: 10px;
+  }
+
+  /* La frase de ayuda se sacrifica: el carrusel ya se explica solo. */
+  .panel-inicio__introduccion {
+    display: none;
+  }
+
+  .carrusel-ciudades {
+    height: clamp(392px, 52vh, 500px);
+  }
+
+  .detalle-ciudad .caja-vidrio__cuerpo {
+    padding: 12px 24px 14px;
+    gap: 10px 20px;
+  }
+
+  .detalle-ciudad__descripcion {
+    font-size: 13px;
+  }
+}
+
 /* --- Pantallas pequeñas ------------------------------------------------- */
 @media (max-width: 620px) {
   .panel-inicio__contenido {
@@ -282,7 +325,17 @@
     justify-content: center;
   }
 
-  .detalle-ciudad__datos {
+  /* La reseña de la ciudad, debajo de la hora. */
+.detalle-ciudad__descripcion {
+  width: 100%;
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--texto-suave);
+  text-wrap: pretty;
+}
+
+.detalle-ciudad__datos {
     justify-content: center;
   }
 }

@@ -10,6 +10,7 @@ import IconoClima from "./IconoClima.jsx";
 export default function DetalleCiudad({
   nombre,
   pais,
+  descripcion,
   hora,
   fecha,
   esDeDia,
@@ -30,6 +31,8 @@ export default function DetalleCiudad({
         </p>
         <p className="detalle-ciudad__fecha">{fecha}</p>
       </div>
+
+      <p className="detalle-ciudad__descripcion">{descripcion}</p>
 
       <div className="detalle-ciudad__datos">
         <span className="etiqueta-dato">{diferenciaContigo}</span>

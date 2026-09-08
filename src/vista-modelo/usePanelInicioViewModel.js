@@ -32,6 +32,7 @@ export function usePanelInicioViewModel(ciudades = CIUDADES) {
     ciudadActiva: {
       nombre: ciudadActiva.nombre,
       pais: ciudadActiva.pais,
+      descripcion: ciudadActiva.descripcion,
       zonaHoraria: ciudadActiva.zonaHoraria,
       hora: ciudadActiva.hora(momento),
       fecha: ciudadActiva.fecha(momento),

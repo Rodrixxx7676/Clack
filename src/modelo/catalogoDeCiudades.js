@@ -13,6 +13,8 @@
  *
  * Las fotos vienen de Wikimedia Commons (uso libre). Para cambiar una,
  * busca la ciudad en commons.wikimedia.org y pega aquí el enlace de la imagen.
+ *
+ * La descripción es una o dos frases: se muestra bajo la hora en el panel.
  */
 import { Ciudad } from "./Ciudad.js";
 
@@ -26,6 +28,8 @@ export const CIUDADES = [
     longitud: -77.0428,
     foto:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Bas%C3%ADlica_Catedral_Metropolitana_de_Lima_%28cropped%29.jpg/960px-Bas%C3%ADlica_Catedral_Metropolitana_de_Lima_%28cropped%29.jpg",
+    descripcion:
+      "Capital peruana frente al Pacífico. Su centro histórico es Patrimonio de la Humanidad y su cocina, de las más celebradas del mundo.",
   }),
   new Ciudad({
     id: "nueva-york",
@@ -36,6 +40,8 @@ export const CIUDADES = [
     longitud: -74.006,
     foto:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/View_of_Empire_State_Building_from_Rockefeller_Center_New_York_City_dllu.jpg/960px-View_of_Empire_State_Building_from_Rockefeller_Center_New_York_City_dllu.jpg",
+    descripcion:
+      "La ciudad que nunca duerme. Centro financiero del planeta y hogar de Central Park, Broadway y la Estatua de la Libertad.",
   }),
   new Ciudad({
     id: "londres",
@@ -46,6 +52,8 @@ export const CIUDADES = [
     longitud: -0.1276,
     foto:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/London_Skyline_%28125508655%29.jpeg/960px-London_Skyline_%28125508655%29.jpeg",
+    descripcion:
+      "Capital británica a orillas del Támesis. Mezcla dos mil años de historia con uno de los centros financieros más activos de Europa.",
   }),
   new Ciudad({
     id: "paris",
@@ -56,6 +64,8 @@ export const CIUDADES = [
     longitud: 2.3522,
     foto:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg/960px-La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg",
+    descripcion:
+      "La Ciudad de la Luz. Cuna del Louvre y la Torre Eiffel, y referente mundial del arte, la moda y la gastronomía.",
   }),
   new Ciudad({
     id: "tokio",
@@ -66,6 +76,8 @@ export const CIUDADES = [
     longitud: 139.6503,
     foto:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Shinjuku_central_park_southwest.jpg/960px-Shinjuku_central_park_southwest.jpg",
+    descripcion:
+      "La metrópolis más poblada del mundo. Templos milenarios y barrios de neón conviven en la capital japonesa.",
   }),
   new Ciudad({
     id: "sidney",
@@ -76,5 +88,7 @@ export const CIUDADES = [
     longitud: 151.2093,
     foto:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Sydney_Australia._%2821339175489%29.jpg/960px-Sydney_Australia._%2821339175489%29.jpg",
+    descripcion:
+      "La ciudad más grande de Australia. Su bahía, con la Ópera y el puente del puerto, es una de las postales más reconocibles del planeta.",
   }),
 ];
