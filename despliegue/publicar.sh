@@ -17,7 +17,9 @@
 # ---------------------------------------------------------------------
 set -euo pipefail
 
-SERVIDOR="ubuntu@34.229.198.32"
+# La dirección del servidor se lee del entorno para no publicarla aquí:
+#   export CLACK_SERVIDOR=usuario@mi-servidor
+SERVIDOR="${CLACK_SERVIDOR:?Falta CLACK_SERVIDOR (usuario@servidor)}"
 LLAVE="${LLAVE_SSH:-$HOME/Downloads/Ticket.pem}"
 DOMINIO="clack.kursperu.duckdns.org"
 PAQUETE="$(mktemp -t clack).tgz"

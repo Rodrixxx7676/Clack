@@ -6,7 +6,7 @@
 # n8n no se entera de que este script existe.
 #
 # Cómo usarlo, desde tu Mac:
-#   ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'bash -s' < despliegue/revisar-servidor.sh
+#   ssh -i ~/ruta/a/tu-llave.pem usuario@tu-servidor 'bash -s' < despliegue/revisar-servidor.sh
 # ---------------------------------------------------------------------
 set -u
 
