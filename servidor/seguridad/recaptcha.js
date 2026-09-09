@@ -45,7 +45,23 @@ export async function verificarFicha({ ficha, accion, ip }) {
     const datos = await respuesta.json();
 
     if (!datos.success) {
-      return { aprobado: false, puntuacion: null, motivo: "Google rechazó la ficha" };
+      // Los códigos de Google dicen exactamente qué falló. Sin esto, un
+      // error de configuración parece un problema del usuario.
+      const codigos = (datos["error-codes"] ?? []).join(", ");
+      console.error(`reCAPTCHA rechazó la ficha. Google dice: [${codigos}]`);
+
+      if (codigos.includes("invalid-input-secret") || codigos.includes("bad-request")) {
+        console.error(
+          "   ⚠️  La CLAVE SECRETA del servidor no es válida.\n" +
+            "   Revisa /etc/clack/recaptcha.env: debe tener 40 caracteres."
+        );
+      }
+
+      return {
+        aprobado: false,
+        puntuacion: null,
+        motivo: `Google rechazó la ficha (${codigos || "sin detalle"})`,
+      };
     }
 
     // La acción debe coincidir: evita reutilizar la ficha de otra pantalla.

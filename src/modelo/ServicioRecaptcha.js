@@ -19,7 +19,7 @@
  * cualquiera puede verla. Es así por diseño.
  */
 
-export const CLAVE_DE_SITIO = "6LfrebAtAAAAAFqsHcEiG2Zk_wBfOdlnoI35i6Cs";
+export const CLAVE_DE_SITIO = "6LfrebAtAAAAAFqsHcEiG2Zk_wBfOdlnol35i6Cs";
 
 const DIRECCION_DEL_SCRIPT = `https://www.google.com/recaptcha/api.js?render=${CLAVE_DE_SITIO}`;
 

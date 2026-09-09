@@ -273,6 +273,22 @@ ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'sudo chmod 600 /etc/clack/re
 
 Debe responder `"recaptcha":"activo"`.
 
+> ⚠️ **Copia y pega las claves, no las transcribas de una captura.** Las
+> claves de reCAPTCHA tienen 40 caracteres y mezclan `I` mayúscula, `l`
+> minúscula, `1`, `O` y `0`, que en pantalla se ven casi igual. Un solo
+> carácter equivocado y el login deja de funcionar con un mensaje que no
+> explica nada. Para comprobar que quedó bien:
+>
+> ```bash
+> ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'S=$(sudo grep RECAPTCHA_SECRET /etc/clack/recaptcha.env | cut -d= -f2); echo "${#S} caracteres (deben ser 40)"'
+> ```
+>
+> Y si algo falla, el servidor ahora dice el motivo exacto de Google:
+>
+> ```bash
+> ssh -i ~/Downloads/Ticket.pem ubuntu@34.229.198.32 'docker logs clack --tail 30 | grep -i recaptcha'
+> ```
+
 > ⚠️ **La clave secreta no se sube nunca a GitHub.** Vive solo en ese
 > archivo del servidor, con permisos `600` (solo la puede leer root).
 > `publicar.sh` se encarga de pasársela al contenedor en cada despliegue.
